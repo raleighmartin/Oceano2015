@@ -1,0 +1,445 @@
+'CR3000 Series Datalogger
+
+' Datalogger 1 - 3 CSTA3
+
+' This datalogger program measures up to NUM_SYSTEM sets of turbulence sensors at 20 Hz. 
+' The time series can be saved to a card. 
+' The datalogger will also compute online statistics from the measured data.
+
+' The following sensors are measured:
+' CSAT3    three dimensional sonic anemometers set To SDM address 4, 5 AND 6.
+
+'Slave pulse received in P1
+
+'*** Unit Definitions ***
+
+'Units    Units
+'C        Celsius
+'degrees  degrees (angle)
+'g        grams
+'m        meters
+'mg       milligrams
+'mmol     millimoles
+'mol      moles
+'s	      seconds
+'umol     micromols
+'V        volts
+
+
+'*** Wiring ***
+
+'SDM INPUT
+'SDM-C1	CSAT3 #4 SDM Data (green)
+'       CSAT3 #5 SDM Data (green)
+'       CSAT3 #6 SDM Data (green)
+'SDM-C2	CSAT3 #4 SDM Clock (white)
+'       CSAT3 #5 SDM Clock (white)
+'       CSAT3 #6 SDM Clock (white)
+'SDM-C3	CSAT3 #4 SDM Enable (brown)
+'       CSAT3 #5 SDM Enable (brown)
+'       CSAT3 #6 SDM Enable (brown)
+'G      CSAT3 #4 SDM reference (black)
+'       CSAT3 #4 SDM shield (clear)
+'       CSAT3 #5 SDM reference (black)
+'       CSAT3 #5 SDM shield (clear)
+'       CSAT3 #6 SDM reference (black)
+'       CSAT3 #6 SDM shield (clear)
+
+'CONTROL PORTS
+'C6     Secondary datalogger (C7; Com4 Tx - PPS)
+'C7     Secondary datalogger (C8; Com4 Rx)
+'C8     not avaliable for use
+'G      Secondary datalogger serial communications referenece (G)
+
+
+'POWER IN
+'12V    datalogger (red)
+'G      datalogger (black)
+
+
+'EXTERNAL POWER SUPPLY
+'POS    CSAT3 #1 power (red)
+'       CSAT3 #2 power (red)
+'       CSAT3 #3 power (red)
+'       datalogger (red)
+'NEG    CSAT3 #4 power reference (black)
+'       CSAT3 #4 power shield (clear)
+'       CSAT3 #5 power reference (black)
+'       CSAT3 #5 power shield (clear)
+'       CSAT3 #6 power reference (black)
+'       CSAT3 #6 power shield (clear)
+'       datalogger (black)
+
+PipeLineMode
+
+'*** Constants ***
+
+'Measurement Rate         '10 Hz     20 Hz      50 Hz    100 Hz
+Const SCAN_INTERVAL = 20  '100 mSec  50 mSec    20 mSec   10 mSec
+
+'Output period
+Const OUTPUT_INTERVAL = 30 'Online statistics output interval in minutes.
+Const NUM_DAY_CPU = 1      'Number of days of data to store on the CPU.
+Const NUM_SYSTEMS = 3      'Number of eddy covariance systems connected to the datalogger.
+Const NUM_DAY_CRD = 30    'Number of days of data to store on the CRD (1 GB - 7.5 days; 2 GB - 15 days; 16 GB - 120.7 days).
+
+Const OFFSET = 16                          'An offset delay that will be introduced to the CSAT3 and LI-7500 data.
+Const DELAY_CSAT = 2                       'Fixed inherent lag of the CSAT3 data (two scans).
+
+'Determine scan buffer size, CSAT3 Execution Parameters and fixed lags for CSAT3 and LI-7500.
+Const SCAN_BUFFER_SIZE = 300*INT (1000/SCAN_INTERVAL)'Compute a 300 second scan buffer.
+Const CSAT_OPT = 60  'Compute CSAT3 Execution Parameter (10 or 20 Hz).
+Const CSAT_REC_BCK = OFFSET-DELAY_CSAT     'Number of records back to align CSAT3 data.
+
+'Compute CPU and CRD storage size for the DIAG DataTable.
+Const DIAG_SIZE_CPU = (NUM_DAY_CPU*1440)/OUTPUT_INTERVAL'Size of diag DataTable on CPU [days].
+Const DIAG_SIZE_CRD = Ceiling (NUM_DAY_CRD*1440)/OUTPUT_INTERVAL  'Size of flux data table on CRD [days].
+
+Const SDM_PER = 30                         'Default SDM clock speed.
+
+'*** Variables ***
+
+'Online lagged CSAT3 and LI-7500 data.
+Public aligned_data(NUM_SYSTEMS,6)
+Alias aligned_data(1,1) = panel_temp
+Alias aligned_data(1,2) = Ux_4
+Alias aligned_data(1,3) = Uy_4
+Alias aligned_data(1,4) = Uz_4
+Alias aligned_data(1,5) = Ts_4
+Alias aligned_data(1,6) = diag_csat_4
+Alias aligned_data(2,1) = dumby_5
+Alias aligned_data(2,2) = Ux_5
+Alias aligned_data(2,3) = Uy_5
+Alias aligned_data(2,4) = Uz_5
+Alias aligned_data(2,5) = Ts_5
+Alias aligned_data(2,6) = diag_csat_5
+Alias aligned_data(3,1) = dumby_6
+Alias aligned_data(3,2) = Ux_6
+Alias aligned_data(3,3) = Uy_6
+Alias aligned_data(3,4) = Uz_6
+Alias aligned_data(3,5) = Ts_6
+Alias aligned_data(3,6) = diag_csat_6
+Units panel_temp = C
+Units Ux_4 = m/s
+Units Uy_4 = m/s
+Units Uz_4 = m/s
+Units Ts_4 = C
+Units diag_csat_4 = unitless
+Units dumby_5 = C
+Units Ux_5 = m/s
+Units Uy_5 = m/s
+Units Uz_5 = m/s
+Units Ts_5 = C
+Units diag_csat_5 = unitless
+Units dumby_6 = C
+Units Ux_6 = m/s
+Units Uy_6 = m/s
+Units Uz_6 = m/s
+Units Ts_6 = C
+Units diag_csat_6 = unitless
+
+Public diag_bits(NUM_SYSTEMS,4) As Boolean	'Warning flags.
+Alias diag_bits(1,1) = del_T_f_4   'Delta temperature warning flag #1.
+Alias diag_bits(1,2) = sig_lck_f_4 'Poor signal lock warning flag #1.
+Alias diag_bits(1,3) = amp_h_f_4   'Amplitude high warning flag #1.
+Alias diag_bits(1,4) = amp_l_f_4   'Amplitude low warning flag #1.
+Alias diag_bits(2,1) = del_T_f_5   'Delta temperature warning flag #2.
+Alias diag_bits(2,2) = sig_lck_f_5 'Poor signal lock warning flag #2.
+Alias diag_bits(2,3) = amp_h_f_5   'Amplitude high warning flag #2.
+Alias diag_bits(2,4) = amp_l_f_5   'Amplitude low warning flag #2.
+Alias diag_bits(3,1) = del_T_f_6   'Delta temperature warning flag #3.
+Alias diag_bits(3,2) = sig_lck_f_6 'Poor signal lock warning flag #3.
+Alias diag_bits(3,3) = amp_h_f_6   'Amplitude high warning flag #3.
+Alias diag_bits(3,4) = amp_l_f_6   'Amplitude low warning flag #3.
+Units diag_bits = samples
+
+Public batt_volt                   'Datalogger battery voltage.
+Units batt_volt = V
+
+'Diagnostic variables.
+Dim disable_flag_on(NUM_SYSTEMS,2) As Boolean'Intermediate processing disable flags.
+'disable_flag_on(i,1)                        'TRUE when CSAT3 diagnostic warning flags are on or CSAT3 has no data.
+'disable_flag_on(i,2)                        'TRUE when CSAT3 diagnostic warning flags are on.
+                                             'Used to filter the sum of CSAT3 diagnostic warning flags.
+
+
+Dim n(1)                                     'Number of samples in the online covariances.
+Units n = samples
+
+
+'No delay CSAT3 data.
+Dim wind_raw(NUM_SYSTEMS,5)
+Alias wind_raw(1,1) = Ux_raw_4
+Alias wind_raw(1,2) = Uy_raw_4
+Alias wind_raw(1,3) = Uz_raw_4
+Alias wind_raw(1,4) = Ts_raw_4
+Alias wind_raw(1,5) = diag_csat_raw_4
+Alias wind_raw(2,1) = Ux_raw_5
+Alias wind_raw(2,2) = Uy_raw_5
+Alias wind_raw(2,3) = Uz_raw_5
+Alias wind_raw(2,4) = Ts_raw_5
+Alias wind_raw(2,5) = diag_csat_raw_5
+Alias wind_raw(3,1) = Ux_raw_6
+Alias wind_raw(3,2) = Uy_raw_6
+Alias wind_raw(3,3) = Uz_raw_6
+Alias wind_raw(3,4) = Ts_raw_6
+Alias wind_raw(3,5) = diag_csat_raw_6
+Units wind_raw = m/s
+Units Ts_raw_4 = C
+Units Ts_raw_5 = C
+Units Ts_raw_6 = C
+Units diag_csat_raw_4 = unitless
+Units diag_csat_raw_5 = unitless
+Units diag_csat_raw_6 = unitless
+
+'No delay analog measurements.
+Dim panel_temp_raw
+Units panel_temp_raw = C
+
+
+Dim i As Long                    'Generic counter variable.
+Dim scan_count As Long           'Number scans executed.
+Dim save_ts_flag_on As Boolean   'Used to synchronize the time series output to the even minute.
+Dim dly_data_out(NUM_SYSTEMS,6)  'Variable used to temporarily store the lagged record.
+Dim diag_csat_work As Long       'Working variable used to break out the CSAT3 diagnostic bits.
+Dim diag_irga_work As Long       'Working variable used to break out the LI-7500 diagnostic bits.
+
+Dim pps As Boolean
+Dim gps_raw_str As String * 66
+Dim gps_str As String * 72
+Dim real_time(9) As Long
+
+Dim process_time
+Dim buff_depth
+
+'Sync
+Dim sync_slave 'Return pulse
+Public SYNC_MasterPSU_IN As Boolean 'Record return pulse
+
+'*** Final Output Data Tables ***
+
+'Online diag data.
+DataTable (diag,TRUE,DIAG_SIZE_CPU)
+  DataInterval (0,OUTPUT_INTERVAL,Min,10)
+  CardOut (0,DIAG_SIZE_CRD)
+
+  Totalize (1,n,IEEE4,NOT (disable_flag_on(1,1) OR disable_flag_on(1,2)))
+  FieldNames ("csat_warnings_4")
+  Totalize (1,n,IEEE4,del_T_f_4 IMP (Ts_4=NAN))
+  FieldNames ("del_T_f_4_Tot")
+  Totalize (1,n,IEEE4,sig_lck_f_4 IMP (Ts_4=NAN))
+  FieldNames ("sig_lck_f_4_Tot")
+  Totalize (1,n,IEEE4,amp_h_f_4 IMP (Ts_4=NAN))
+  FieldNames ("amp_h_f_4_Tot")
+  Totalize (1,n,IEEE4,amp_l_f_4 IMP (Ts_4=NAN))
+  FieldNames ("amp_l_f_4_Tot")
+
+  Totalize (1,n,IEEE4,NOT (disable_flag_on(2,1) OR disable_flag_on(2,2)))
+  FieldNames ("csat_warnings_5")
+  Totalize (1,n,IEEE4,del_T_f_5 IMP (Ts_5=NAN))
+  FieldNames ("del_T_f_5_Tot")
+  Totalize (1,n,IEEE4,sig_lck_f_5 IMP (Ts_5=NAN))
+  FieldNames ("sig_lck_f_5_Tot")
+  Totalize (1,n,IEEE4,amp_h_f_5 IMP (Ts_5=NAN))
+  FieldNames ("amp_h_f_5_Tot")
+  Totalize (1,n,IEEE4,amp_l_f_5 IMP (Ts_5=NAN))
+  FieldNames ("amp_l_f_5_Tot")
+
+  Totalize (1,n,IEEE4,NOT (disable_flag_on(3,1) OR disable_flag_on(3,2)))
+  FieldNames ("csat_warnings_6")
+  Totalize (1,n,IEEE4,del_T_f_6 IMP (Ts_6=NAN))
+  FieldNames ("del_T_f_6_Tot")
+  Totalize (1,n,IEEE4,sig_lck_f_6 IMP (Ts_6=NAN))
+  FieldNames ("sig_lck_f_6_Tot")
+  Totalize (1,n,IEEE4,amp_h_f_6 IMP (Ts_6=NAN))
+  FieldNames ("amp_h_f_6_Tot")
+  Totalize (1,n,IEEE4,amp_l_f_6 IMP (Ts_6=NAN))
+  FieldNames ("amp_l_f_6_Tot")
+
+  Average (1,panel_temp,IEEE4,FALSE)
+  Average (1,batt_volt,IEEE4,FALSE)
+  Average (1,process_time,IEEE4,FALSE)
+  StdDev (1,process_time,IEEE4,FALSE)
+  Maximum (1,process_time,IEEE4,FALSE,FALSE)
+  Average (1,buff_depth,IEEE4,FALSE)
+  Maximum (1,buff_depth,IEEE4,FALSE,FALSE)
+EndTable
+
+'Time series data.
+DataTable (ts_data,save_ts_flag_on,-1)
+  DataInterval (0,SCAN_INTERVAL,mSec,10)
+  CardOut (1,-1)
+  'TableFile ("CRD:"&Status.SerialNumber(1,1)&".ts_data_",64,-1,0,1,Day,0,0)
+
+  Sample (1,Ux_4,IEEE4)
+  Sample (1,Uy_4,IEEE4)
+  Sample (1,Uz_4,IEEE4)
+  Sample (1,Ts_4,IEEE4)
+  Sample (1,diag_csat_4,IEEE4)
+
+  Sample (1,Ux_5,IEEE4)
+  Sample (1,Uy_5,IEEE4)
+  Sample (1,Uz_5,IEEE4)
+  Sample (1,Ts_5,IEEE4)
+  Sample (1,diag_csat_5,IEEE4)
+
+  Sample (1,Ux_6,IEEE4)
+  Sample (1,Uy_6,IEEE4)
+  Sample (1,Uz_6,IEEE4)
+  Sample (1,Ts_6,IEEE4)
+  Sample (1,diag_csat_6,IEEE4)
+
+EndTable
+
+'*** Working Data Tables ***
+
+'Reorder the data and prepare to lag all the data.
+DataTable (dly_data,TRUE,OFFSET)
+  TableHide
+  Sample (1,panel_temp_raw,IEEE4)
+  Sample (1,Ux_raw_4,IEEE4)
+  Sample (1,Uy_raw_4,IEEE4)
+  Sample (1,Uz_raw_4,IEEE4)
+  Sample (1,Ts_raw_4,IEEE4)
+  Sample (1,diag_csat_raw_4,IEEE4)
+
+  Sample (1,panel_temp_raw,IEEE4)
+  FieldNames ("dumby_raw_5")
+  Sample (1,Ux_raw_5,IEEE4)
+  Sample (1,Uy_raw_5,IEEE4)
+  Sample (1,Uz_raw_5,IEEE4)
+  Sample (1,Ts_raw_5,IEEE4)
+  Sample (1,diag_csat_raw_5,IEEE4)
+
+  Sample (1,panel_temp_raw,IEEE4)
+  FieldNames ("dumby_raw_6")
+  Sample (1,Ux_raw_6,IEEE4)
+  Sample (1,Uy_raw_6,IEEE4)
+  Sample (1,Uz_raw_6,IEEE4)
+  Sample (1,Ts_raw_6,IEEE4)
+  Sample (1,diag_csat_raw_6,IEEE4)
+
+EndTable
+
+'Slave pulse receipt
+DataTable (MasterPSU_slave,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every scan interval
+	DataInterval (0,SCAN_INTERVAL,mSec,10)
+
+	'sample the sync channel, True means a sync signal was outputted
+	Sample (1,SYNC_MasterPSU_IN,Boolean)
+EndTable
+
+'*** Program ***
+
+BeginProg
+  'Set all CSAT3 variables To NAN.
+  Move (Ux_raw_4,15,NAN,1)
+
+  'Set the SDM clock speed.
+  SDMSpeed (SDM_PER)
+
+  SerialOpen (Com4,38400,0,0,72)
+  Scan (SCAN_INTERVAL,mSec,SCAN_BUFFER_SIZE,0)
+    'Send simulated GPS PPS to secondary datalogger.
+    If ( IfTime (900,1000,mSec) ) Then ( pps = TRUE ) Else ( pps = FALSE )
+    PortSet (6,pps)
+    Delay (0,10,uSec)
+    PortSet (6,FALSE)
+
+    'Datalogger panel temperature.
+    PanelTemp (panel_temp_raw,250)
+
+    'Measure battery voltage.
+    Battery (batt_volt)
+
+    'Lag the CSAT3 and LI-7500 measurements.
+    CallTable dly_data
+    If ( scan_count >= OFFSET ) Then
+      'Load in the analog data that has been lagged by OFFSET scans.
+      GetRecord (dly_data_out(1,1),dly_data,OFFSET)
+      Move (panel_temp,1,dly_data_out(1,1),1)	'panel_temp
+
+      'Load in CSAT3 data that has been lagged by CSAT_REC_BCK scans.
+      GetRecord (dly_data_out(1,1),dly_data,CSAT_REC_BCK)
+      Move (Ux_4,5,dly_data_out(1,2),5) 'Ux_4, Uy_4, Uz_4, Ts_4, diag_csat_4
+      Move (Ux_5,5,dly_data_out(2,2),5) 'Ux_5, Uy_5, Uz_5, Ts_5, diag_csat_5
+      Move (Ux_6,5,dly_data_out(3,2),5) 'Ux_6, Uy_6, Uz_6, Ts_6, diag_csat_6
+      
+     For i = 1 To NUM_SYSTEMS
+        'Define 61502 as NAN.
+        If ( aligned_data(i,6) = NAN ) Then ( aligned_data(i,6) = 61502 ) 'aligned_data(i,6) = diag_csat_i
+
+        'Break up the four CSAT3 warning flags into four separate bits.
+        Move (diag_csat_work,1,aligned_data(i,6),1) 'aligned_data(i,6) = diag_csat_i
+        diag_bits(i,1) = diag_csat_work AND &h8000 'diag_bits(i,1) = del_T_f_i
+        diag_bits(i,2) = diag_csat_work AND &h4000 'diag_bits(i,2) = sig_lck_f_i
+        diag_bits(i,3) = diag_csat_work AND &h2000 'diag_bits(i,3) = amp_h_f_i
+        diag_bits(i,4) = diag_csat_work AND &h1000 'diag_bits(i,4) = amp_l_f_i
+
+        'Turn on the intermediate processing disable flag when any CSAT3 warning flag is
+        ' high, including the special cases NAN (61502), a Lost Trigger (61440), No Data
+        ' (61503), an SDM error (61441), or wrong CSAT3 embedded code (61442).
+        disable_flag_on(i,1) = diag_csat_work AND &hf000
+
+        'Turn on only when CSAT3 diagnostic warning flags are set.
+        disable_flag_on(i,2) = disable_flag_on(i,1) AND (aligned_data(i,5) <> NAN) 'aligned_data(i,5) = Ts_i
+
+        'Save the four most significant bits of the CSAT3 diagnostics, except for the
+        ' special cases NAN (61502), a Lost Trigger (61440), No Data (61503), an SDM
+        ' error (61441), or wrong CSAT3 embedded code (61442).
+        If ( diag_csat_work <= &hf000 ) Then ( aligned_data(i,6) = diag_csat_work>>12 ) 'aligned_data(i,6) = diag_csat_i
+
+      Next i
+
+      process_time = Status.ProcessTime(1,1)
+      buff_depth = Status.BuffDepth(1,1)
+
+      'Start saving the time series data on an even minute boundary.
+      If ( (NOT (save_ts_flag_on)) AND (IfTime (0,1,Min)) ) Then ( save_ts_flag_on = TRUE )
+
+      'Save adjusted time series data.
+      CallTable ts_data
+      CallTable diag
+      
+    Else
+      scan_count = scan_count+1
+    EndIf
+
+    'Trigger all the CSAT3s to make measurements.
+    SDMTrigger
+
+    'Get CSAT3 #1 wind and sonic temperature data.
+    CSAT3 (Ux_raw_4,1,4,98,CSAT_OPT)
+
+    'Get CSAT3 #2 wind and sonic temperature data.
+    CSAT3 (Ux_raw_5,1,5,98,CSAT_OPT)
+
+    'Get CSAT3 #3 wind and sonic temperature data.
+    CSAT3 (Ux_raw_6,1,6,98,CSAT_OPT)
+    
+    
+	'Sample the slave channel for timing pulses
+	PulseCount (sync_slave,1,1,0,0,1.0,0)
+		
+	'Convert to boolean if not true
+	If sync_slave=1 Then
+		SYNC_MasterPSU_IN=True
+		CallTable (MasterPSU_slave)
+	EndIf
+
+  NextScan
+
+SlowSequence
+
+  Scan (1,Sec,0,0)
+    'Simulate the GPRMC GPS string. This string contains the primary datalogger time.
+    RealTime (real_time(1))
+    '$GPRMC,hhmmss,a,ddmm.mmm,n,dddmm.mmm,w,zzz.z,yyy.y,ddmmyy,ddd.d,v*cc<CR><LF>
+    gps_raw_str = "GPRMC," & FormatFloat ((real_time(4)*1e4)+(real_time(5)*1e2)+real_time(6),"%06.00f") & ",A,0000.0000,N,00000.0000,W,000.0,000.0," & FormatFloat ((real_time(3)*1e4)+(real_time(2)*1e2)+FRAC (real_time(1)/1e2)*1e2,"%06.00f") & ",000.0,E"
+    gps_str = "$" & gps_raw_str & "*" & Hex (CheckSum (gps_raw_str,9,0)) & CHR (13) & CHR (10)
+    'Send the simuilated GPRMC GPS string to the secondary datalogger.
+    SerialOutBlock (Com4,gps_str,Len (gps_str))
+  NextScan
+EndProg

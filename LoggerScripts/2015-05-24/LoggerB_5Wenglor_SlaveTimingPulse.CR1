@@ -1,0 +1,117 @@
+'LOGGER B - measure at 25 Hz
+
+'5 Wenglors (W5-W9) - C1-5
+'1 GPS timing pulse - C7-C8
+'record battery voltage at 1/minute
+'Slave pulse received in P1
+
+'DATALOGGER PROGRAM SETUP
+'Force the logger to run in pipeline mode
+PipeLineMode
+
+'Setup the program constants
+Const SCAN_INTERVAL = 40     'set the fastest scan interval here in mSec.
+
+'VARIABLES
+'Battery
+Public Batt_Volt
+
+'Wenglors
+Public W5
+Public W6
+Public W7
+Public W8
+Public W9
+
+'Variables for GPS (time)
+Dim nmea_sentence(4) As String * 82
+Dim gps_data(30)
+
+'Sync
+Dim sync_slave 'Return pulse
+Public SYNC_B_IN As Boolean 'Record return pulse
+
+'UNITS
+Units Batt_Volt=Volts
+Units W5=counts
+Units W6=counts
+Units W7=counts
+Units W8=counts
+Units W9=counts
+
+'DATA TABLES
+
+'Wenglor data
+DataTable(loggerB_wenglor,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every record
+	DataInterval (0,SCAN_INTERVAL,mSec,10)
+  
+	'Sample the wenglors
+	Totalize (1,W5,FP2,0)
+	Totalize (1,W6,FP2,0)
+	Totalize (1,W7,FP2,0)
+	Totalize (1,W8,FP2,0)
+	Totalize (1,W9,FP2,0)
+EndTable
+
+'Battery data
+DataTable (loggerB_battery,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every minute
+	DataInterval(0,1,Min,10)
+	Minimum(1,Batt_Volt,FP2,False,False)
+EndTable
+
+'Slave pulse receipt
+DataTable (loggerB_slave,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every scan interval
+	DataInterval (0,SCAN_INTERVAL,mSec,10)
+
+	'sample the sync channel, True means a sync signal was outputted
+	Sample (1,SYNC_B_IN,Boolean)
+EndTable
+
+'MAIN PROGRAM
+BeginProg
+
+    'Set scanning interval, leave buffer overload to 10
+	Scan (SCAN_INTERVAL,mSec,10,0)	  
+		
+		'Get GPS (timing)
+		GPS (gps_data(1),Com4,0,0,nmea_sentence(1))
+		
+		'Measure wenglors (C1-5)
+		PulseCount (W5,1,11,0,0,1.0,0)
+		PulseCount (W6,1,12,0,0,1.0,0)
+		PulseCount (W7,1,13,0,0,1.0,0)
+		PulseCount (W8,1,14,0,0,1.0,0)
+		PulseCount (W9,1,15,0,0,1.0,0)
+	
+		'Call Output Tables
+		CallTable (loggerB_wenglor)
+		
+		'Sample the slave channel for timing pulses
+		PulseCount (sync_slave,1,1,0,0,1.0,0)
+		
+		'Convert to boolean if not true
+		If sync_slave=1 Then
+			SYNC_B_IN=True
+			CallTable (loggerB_slave)
+		EndIf
+	NextScan
+	
+	'Battery slow sequence scan
+	SlowSequence
+		Scan (1,Sec,10,0)
+		
+			'Default Datalogger Battery Voltage measurement Batt_Volt:
+			Battery(Batt_Volt)
+		
+			'Call Data Tables and Store Data
+			CallTable(loggerB_battery)
+		NextScan
+	EndSequence
+ 	
+EndProg

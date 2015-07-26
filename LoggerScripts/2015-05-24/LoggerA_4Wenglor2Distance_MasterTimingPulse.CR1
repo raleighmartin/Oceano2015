@@ -1,0 +1,184 @@
+'LOGGER A - measure at 25 Hz
+
+'4 Wenglors (W1-W4) - C1-4
+'2 distance sensors (L1-L2) - DIFF3, DIFF6,
+'1 GPS timing pulse - C7-C8
+'record battery voltage at 1/minute
+'Master pulse emitted from C6
+'Slave pulse received in P1
+
+'DATALOGGER PROGRAM SETUP
+'Force the logger to run in pipeline mode
+PipeLineMode
+
+'Setup the program constants
+Const SCAN_INTERVAL = 40     'set the fastest scan interval here in mSec.
+
+'VARIABLES
+'Battery
+Public Batt_Volt
+
+'Wenglors
+Public W1
+Public W2
+Public W3
+Public W4
+
+'Distance variables
+Public L1
+Public L2
+
+'Distance calibration variables
+Public dist_max_L1
+Public dist_min_L1
+Public a_L1
+Public b_L1
+Public dist_max_L2
+Public dist_min_L2
+Public a_L2
+Public b_L2
+
+'Variables for GPS (time)
+Dim nmea_sentence(4) As String * 82
+Dim gps_data(30)
+
+'Sync
+Public SYNC_A_OUT As Boolean 'Output pulse
+Dim sync_slave 'Return pulse
+Public SYNC_A_IN As Boolean 'Record return pulse
+
+'UNITS
+Units Batt_Volt=Volts
+Units W1=counts
+Units W2=counts
+Units W3=counts
+Units W4=counts
+Units L1=mm
+Units L2=mm
+
+'DATA TABLES
+
+'Wenglor data
+DataTable(loggerA_wenglor,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every record
+	DataInterval (0,SCAN_INTERVAL,mSec,10)
+  
+	'Sample the wenglors
+	Totalize (1,W1,FP2,0)
+	Totalize (1,W2,FP2,0)
+	Totalize (1,W3,FP2,0)
+	Totalize (1,W4,FP2,0)
+EndTable
+
+'Distance data
+DataTable (loggerA_distance,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every second
+	DataInterval(0,1,Sec,10)
+	
+	'Average from the distance sensor
+	Average(1,L1,FP2,False)
+	
+	'Average from the distance sensor
+	Average(1,L2,FP2,False)
+EndTable
+
+'Battery data
+DataTable (loggerA_battery,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every minute
+	DataInterval(0,1,Min,10)
+	Minimum(1,Batt_Volt,FP2,False,False)
+EndTable
+
+'Master pulse
+DataTable (loggerA_master,1,-1)  
+CardOut(0,-1) 'Specify to send data to card
+	'sample the sync channel, True means a sync signal was outputted
+	Sample (1,SYNC_A_OUT,Boolean)
+EndTable
+
+'Slave pulse receipt
+DataTable (loggerA_slave,1,-1)	
+CardOut(0,-1) 'Specify to send data to card
+	'Log every scan interval
+	DataInterval (0,SCAN_INTERVAL,mSec,10)
+
+	'sample the sync channel, True means a sync signal was outputted
+	Sample (1,SYNC_A_IN,Boolean)
+EndTable
+
+'MAIN PROGRAM
+BeginProg
+
+    'Set scanning interval, leave buffer overload to 10
+	Scan (SCAN_INTERVAL,mSec,10,0)
+		
+		'Get GPS (timing)
+		GPS (gps_data(1),Com4,0,0,nmea_sentence(1))
+		
+		'Measure wenglors (C1-4)
+		PulseCount (W1,1,11,0,0,1.0,0)
+		PulseCount (W2,1,12,0,0,1.0,0)
+		PulseCount (W3,1,13,0,0,1.0,0)
+		PulseCount (W4,1,14,0,0,1.0,0)
+	
+		'Call Output Tables
+		CallTable (loggerA_wenglor)
+		
+		'Sample the slave channel for timing pulses
+		PulseCount (sync_slave,1,1,0,0,1.0,0)
+		
+		'Convert to boolean if not true
+		If sync_slave=1 Then
+			SYNC_A_IN=True
+			CallTable (loggerA_slave)
+		EndIf
+	NextScan
+	
+	'Distance sensor and battery slow sequence scan
+	SlowSequence
+		Scan (1,Sec,10,0)
+			'Sick distance measurement (note calibration via last two parameters, 'a' and 'b')
+			'Calibration is L1 = a_L1*mV+b_L1, (DIST in mm)
+			dist_min_L1 = 100 'mm
+			dist_max_L1 = 1023 'mm
+			a_L1 = (dist_max_L1-dist_min_L1)/1600
+			b_L1 = 1.25*dist_min_L1-0.25*dist_max_L1
+			VoltDiff(L1,1,mV2500,3,True,0,_60Hz,a_L1,b_L1)
+			If (L1>dist_max_L1) Or (L1<dist_min_L1) Then L1=-999
+			
+			'Sick distance measurement (note calibration via last two parameters, 'a' and 'b')
+			'Calibration is L2 = a_L2*mV+b_L2, (DIST in mm)
+			dist_min_L2 = 100 'mm
+			dist_max_L2 = 1023 'mm
+			a_L2 = (dist_max_L2-dist_min_L2)/1600
+			b_L2 = 1.25*dist_min_L2-0.25*dist_max_L2
+			VoltDiff(L2,1,mV2500,6,True,0,_60Hz,a_L2,b_L2)
+			If (L2>dist_max_L2) Or (L2<dist_min_L2) Then L2=-999
+		
+			'Default Datalogger Battery Voltage measurement Batt_Volt:
+			Battery(Batt_Volt)
+		
+			'Call Data Tables and Store Data
+			CallTable(loggerA_distance)
+			CallTable(loggerA_battery)
+		NextScan
+	EndSequence
+	
+	'Master timing pulse in slow sequence scan
+	SlowSequence
+		'Set the scan interval
+		Scan (60,Sec,10,0)
+			PortSet (6,1)		'portset high
+			Delay (0,5,mSec)	'delay 5 mSec
+			PortSet (6,0)		'portset low
+			SYNC_A_OUT=True		'set flag high
+			
+			'Call the sync table to record the timestamps
+			CallTable (loggerA_master)
+		NextScan
+	EndSequence
+ 	
+EndProg

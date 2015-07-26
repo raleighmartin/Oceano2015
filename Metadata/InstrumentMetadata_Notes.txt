@@ -1,0 +1,338 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+% INSTRUMENT POSITIONS %
+%%%%%%%%%%%%%%%%%%%%%%%%
+-- Coordinate scheme --
+x is streamwise (positive downwind)
+y is spanwise (positive according to right hand rule, to right if looking upwind)
+z is vertical (positive up)
+Orientation of setup (upwind direction) is 290 degrees (WNW)
+Campbell sonics set such that u is positive downwind, v is positive to NNE
+RM Young sonics set such that u is negative downwind, v is negative to NNE
+
+-- General notes --
+Heights for BSNEs and ultrasonic anemometers are based entirely on measuring tape observations
+
+Heights of laser distance sensors, Wenglors, Campbell sonics, dust sensors, cup anemometers, and weather station (for the most part) are heights relative to L2 distance sensor, which is automatically set to 0 m.  Script will then adjust these heights based on observations from laser distance sensor. (We may want to subtract 2 cm from this z, because there was a decent amount of scour even below this front distance sensor, which looked to be about 2 cm.)
+
+—- Distance Sensors —-
+L2 (upwind) distance sensor (x=-6cm, y=0cm) is reference for instrument heights.  z~24cm (varies dynamically in logger records).  Even though it is upwind of Wenglors, choose this is as height reference because there is a lot of scour beneath L1.
+
+L1 (downwind) distance sensor (x=0cm,y=0cm) is co-located with Wenglors.  However, do not use this as reference distance sensor, because there is often significant scour beneath this sensor.
+
+—- Campbell Sonics —-
+Positions constant for whole period of deployment
+x ~ 0 for all instruments (actually x ~ -4 cm for S1, S2, S3), possibly somewhat downwind for S4, S5, S6 (difficult to measure these)
+
+y = 0 for all instruments
+
+z of instruments (relative to L2 distance sensor)
+S1: z = 0.40 m (abs ~ 0.64 m)
+S2: z = 0.92 m (abs ~ 1.16 m)
+S3: z = 1.83 m (abs ~ 2.07 m)
+S4: z = 2.8 m (abs ~ 3.04 m)
+S5: z = 5.75 m (abs ~ 5.99 m)
+S6: z = 8.7 m (abs ~8.94 m)
+z uncertainty of 2cm for S1-S3 and 5cm for S4-S6 due to difficulty of identifying central position of sonic volume and large distances among higher sonics
+
+—- Cup anemometers —
+Mounted on poles with S5 and S6 sonic anemometers.  C1 and C5 not used due to instrument malfunctions identified in lab prior to deployment.  Note that x positions were eyeballed from the ground and more careful measurements will be needed at the end of the deployment.  Position as follows:
+C2: x,y,z (m): 0.75, 0, 4.9 (abs ~ 5.15 m)
+C3: x,y,z (m): 0.75, 0, 6.6 (abs ~6.85 m)
+C4: x,y,z (m): 0.75, 0, 7.85 (abs ~8.1 m)
+C6: x,y,z (m): 0.75, 0, 9.55 (abs ~9.8 m)
+Heights given are relative to L1/L2 distance sensors
+
+—- Wenglors —-
+Sensors mounted on fixed array, positions constant through whole deployment.  x,y,z positions (cm), relative to L1 distance sensor, as follows:
+W1 = 0, -23.5, -17 (abs z ~ 7 cm)
+W2 = 0, 7.5, -16 (abs z ~ 8 cm)
+W3 = 0, -6.5, -14.3 (abs z ~ 10 cm) 
+W4 = 0, 24.5, -11.8 (abs z ~ 12 cm)
+W5 = 0, -28.5, -9 (abs z ~ 15 cm) 
+W6 = 0, 12, -5 (abs z ~ 19 cm)
+W7 = 0, -11.5, 1 (abs z ~ 25 cm)
+W8 = 0, 29, 9.9 (abs z ~ 34 cm)
+W9 = 0, -30, 22.7 (abs z ~ 47 cm)
+Though it is not co-located in x, use L2 (upwind) as calibration value for absolute heights of Wenglors.  L1, which was co-located in x, gives overestimates of z due to scour 
+immediately beneath Wenglor array.
+z-uncertainty in relative values due to measurement error and possible tilting of tower (1 cm).
+
+Allocation of instruments:
+5/15/2015: W1=R10, W2=23, W3=R6, W4=14, W5=R4, W6=19, W7=R5, W8=21, W9=R1
+5/16/2015: W1=R10(before 13:09)/R2(after 13:17), W2=23, W3=R6, W4=14, W5=R4, W6=19, W7=R5, W8=21, W9=R1
+5/18/2015: W1=R7, W2=9, W3=R6, W4=14, W5=R4, W6=19, W7=R5, W8=21, W9=R1
+5/19/2015: W1=R7, W2=9, W3=R6, W4=14, W5=R4, W6=19, W7=R5, W8=21, W9=R1
+5/23/2015: W1=R7, W2=23, W3=R6, W4=14, W5=R4, W6=19, W7=R5, W8=21, W9=R1
+5/24/2015: W1=R7, W2=R10, W3=R6, W4=14, W5=R4, W6=19, W7=R5, W8=21, W9=R1
+5/27/2015: W1=R2, W2=R10, W3=R6, W4=14, W5=R4, W6=R9, W7=R5, W8=21, W9=R1
+6/1/2015: W1=R2, W2=R10, W3=R6, W4=14, W5=R4, W6=R8, W7=R5, W8=21, W9=R1
+6/2/2015: W1=23, W2=9, W3=R6, W4=14, W5=R4, W6=R8, W7=R5, W8=21, W9=R1
+
+—- Weather station —-
+Mounted on downwind side of tower.
+x,y,z (m) = 2.7,0,1.75 (abs z ~ 2 m)
+Position fixed for duration of deployment.
+
+—- Ultrasonic (RM Young) anemometers —-
+Mounted at various locations with spanwise offset from main tower.  Initially, x~40 cm; subsequently (starting 5/22), x~10 cm.  Heights measured at beginning and end of each saltation day given in instrument metadata spreadsheet.
+5/19 to 5/24/15: Positioned at z~63 cm in a spanwise array
+(on 5/22, moved anemometers upwind by 30 cm to reduce interference of adjacent BSNEs)
+(on 5/24, swapped spanwise positions of U1/U2 and U3/U4 in array)
+5/26 to 5/28/15: Positioned at z~203 cm in a spanwise array
+5/29 to 5/30/15: U2-U4 remain at z~203 cm, U1 moved to z~143 cm
+For analysis on saltation days, use only times of BSNE trap opening (when BSNEs closed and we were collecting sand, we were often standing very close to sonics and therefore data cannot be trusted).
+
+—- Dust sensors —-
+Dust sensors mounted at various heights and positions throughout deployment.  Allocation of dust sensors to logger tables also changed at various times, so need to be careful!
+
+For uniformity, assign variables as D1, D2, and D3 (in that order) for data table from logger E and D4 for data table from CR1000PSU
+
+Heights of dust sensors on tower are given relative to L2.
+5/15 to 5/18/15: Three dust sensors at z~1.6 (D1), 3.5 (D2), 6.4 (D3) m on tower
+5/19/15: Added dust sensor at z~2.7 m (D4) on tower
+5/26/15: Moved z~3.5 m dust sensor to z~1.1 m on tower, switched logger location (now D3).  z~6.5 m dust sensor is now D2.
+5/29/15: Now, only one dust sensor (z~6.4 m) remains on tower, though now it is D4.  Others moved to +y away from tower, with heights of z~0.75 (D1), 1.5 (D2), and 2.3 (D3) m.
+Need to check these!
+
+Sensor position when mounted on towers (variable names vary).  z is relative to L2
+lowest: x=1.5m (just in front of tower), y=-0.2m, z=0.87m (abs ~1 m)
+next: x=1.8m (just in front of tower), y=0m, z=1.38m (abs ~1.6 m)
+next: x=3.1m (behind tower), y=0m, z=3.3m (abs ~3.5 m)
+next: x=3.1m (behind tower), y=0m, z=6.2m (abs ~6.4 m)
+
+Sensor positions when mounted spanwise away from tower, starting on 5/29/15
+lowest: x~0m, y=2.67m, z=0.75m (absolute)
+next: x~0m, y=2.67m, z=1.5m (absolute)
+next: x~0m, y=2.9m, z=2.3m (absolute)
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% NOTES, DAY BY DAY %%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+-- Oceano 5/15/15 —-
+SALTATION (MODERATE)
+Raleigh, Livia, Arkayan, Jasper, and Marcelo in field
+Rained day before, ground was wet in morning (mostly dry at 12:00)
+11:10 — Valid data start time for Wenglors, distance sensors, and lower sonics (instrument interference before this time)
+11:12 - Valid data start time for cups and weather station (loggers on)
+11:38 - Analysis start time for all instruments (except dust) -- all loggers on and past data gaps
+GoPro time-lapse looking down at ripples from ~10 cm above ground attached to north side guy wire anchor
+13:03 - Start time for dust sensors
+18:03 - Analysis stop time for Wenglors, distance sensors, and sonics
+18:05-18:10 - Wenglor/BSNE surface sample
+18:14 - Stop time for dust sensors
+18:21 - Restart sonics
+18:47 - Restart lower Wenglors / distance sensors (notebook says 19:02, but no indication for reason to throw out data before this time)
+20:15 - End Wenglors and distance sensors (sonics kept running through night after this time)
+!!! Significant gaps in timeseries due to failed “GPS” sync method.  Gaps identified at following times:
+CR1000PSU: 11:27:13-11:27:16, 11:37:57-11:38:00, 11:39:07-11:39:12
+loggerA (slow sequence): 11:19:50-11:19:54, 11:37:56-11:38:00, 11:39:07-11:39:14
+loggerA (main sequence): 11:19:51-11:19:51.12, 11:27:13.72-11:27:14.08, 11:37:57.16-11:37:58.08, 11:39:07:56-11:39:07.08 (backwards), 11:39:07.88-11:39:08.08, 11:39:08.88-11:39:09.08, 11:39:09.88-11:39:10.08
+loggerB (main sequence): 11:19:51-11:19:51.12, 11:27:13.76-11:27:14.08, 11:37:57.16-11:37:58.08, 11:39:07:56-11:39:07.08 (backwards), 11:39:07.88-11:39:08.08, 11:39:08.88-11:39:09.08, 11:39:09.88-11:39:10.08
+Master PSU: No gaps
+SlavePSU: 11:39:07.58-11:39:07.04 (backwards), 11:39:07.9-11:39:08.04, 11:39:08.9-11:39:09.04, 11:39:09.9-11:39:10.04
+Note missing data from weather station today after 18:21
+
+-- Oceano 5/16/15 —-
+SALTATION (WEAK)
+Raleigh, Arkayan, Livia, and Marcelo in field (Livia and Marcelo left midday)
+Arkayan and Raleigh performed GPS transects for upwind topography
+? AM - Surface sampling for Wenglors / BSNEs
+10:48 AM — Start time for Wenglors, distance sensors, and lower sonics (end of disturbance)
+13:09-13:17 - Replaced W1 Wenglor (reached in from behind, so disturbance to other sensors should be minimal)
+? PM - Surface sampling for Wenglors / BSNEs
+
+-- Oceano 5/17/15 —-
+NO SALTATION
+Did not visit site, but Campbell sonics, cup anemometers, and weather station were running
+
+-- Oceano 5/18/15 —-
+SALTATION (MODERATE)
+Livia and Raleigh in field
+10:30 AM - Surface sampling for Wenglors / BSNEs
+11:33 AM - Start time for Wenglors, distance sensors, and lower sonics
+11:58 AM - Start time for cup anemometers
+? PM - Surface sampling for Wenglors / BSNEs
+17:50 PM - End time for sonics / Wenglors
+
+-- Oceano 5/19/15 —-
+SALTATION (STRONG)
+Raleigh, Livia, and Arkayan in field
+Started using RM Young ultrasonic anemometers today (z~63 cm)
+? AM - Surface sampling for Wenglors / BSNEs
+11:28 - Start time for Wenglors, distance sensors, and lower sonics
+Many missing times in logger A records for Wenglors prior to 13:21 (especially before 12:37)
+13:50 - 15:18 - Interval for all dust sensors.  At 15:18 PM, switched D2 and D3 for a test (later switched back?).  One of dust sensors (which one?) failed due to blown fuse.  Replaced fuse and redeployed.
+17:53 - End time for Wenglors, distance sensors, and lower sonics
+BSNE intervals (for analysis of ultrasonic anemometers): 14:13-15:13, 15:25-16:25.  One earlier BSNE interval, but ultrasonics were not running at this time.
+
+-- Oceano 5/20/15 —-
+NO SALTATION
+Nobody in field, but instruments running. (Did someone start instruments at 10:23 AM?)
+Note missing data from cups today after 10:16 AM
+
+
+-- Oceano 5/21/15 —-
+NO SALTATION
+Nobody in field, but instruments running.
+
+—- Oceano 5/22/15 —-
+NO SALTATION
+Raleigh and Arkayan went to field, discovered timing problems with GPS command.  Also, went to field anticipating saltation but none occurred.  Stopped instruments running.
+
+—- Oceano 5/23/15 —-
+SALTATION (STRONG)
+Raleigh and Livia in field.  Attempt to fix timing problems with GPS command.
+12:04: Reset times on all loggers using Raleigh’s computer.
+BSNE intervals (use for ultrasonics): 12-13:30, 13:40-14:40, 14:49-15:49, 15:58-16:58, 17:06-18:06.
+18:25: Analysis end time.  Checked sync on loggers.  All loggers are offset by -1.2s relative to computer (i.e., later than computer) except for master which was offset by -0.3s relative to computer.
+
+!!! Significant gaps in timeseries due to failed “GPS” sync method.  Gaps identified at following times:
+LoggerA: 14:58:21.92-14:58:22.08, 16:02:07.00-16:02:07.12, 16:02:18.28-16:02:19.08, 16:02:19.88-16:02:20.08, 16:02:20.92-16:02:21.08, 18:24:16.8-18:24:16.08 (backwards!)
+Slave: 16:02:17.86-16:02:19:06, 16:02:19.76-16:02:20.04, 16:02:20.78-16:02:21.04
+
+—- Oceano 5/24/15 —-
+SALTATION (MODERATE)
+Raleigh and Arkayan in field.  First day using timing pulses for instrument sync.
+Swapped positions of U1/U2 ultrasonics and U3/U4 ultrasonics.
+All times synced on loggers at 11:24 AM (except dust logger synced at 11:27 AM)
+12:37: Shut off dust sensors to preserve power
+13:08: Restart dust sensors
+15:23: Restart dust sensors with new battery
+BSNE intervals (use for ultrasonics): 11:46-14:00, 14:08-15:08, 15:16-16:46
+?: Analysis end time
+
+—- Oceano 5/25/15 —-
+NO SALTATION
+Nobody in field, no data collected.
+
+—- Oceano 5/26/15 —-
+NO SALTATION
+Logger sync time = 13:07
+Dust logger dies at 18:01
+Other sensors end at 18:39
+Livia and Arkayan in field.  Raleigh arrives later to bring new dust sensors.
+
+—- Oceano 5/27/15 —-
+SALTATION (WEAK)
+Raleigh and Arkayan in field.
+10:58: Analysis start time (All logger programs compiled and times synced among loggers, no more interference with instruments).
+BSNE intervals (use for ultrasonics): 11:16-14:00, 14:08-16:08, 16:18-17:48.
+18:10: Analysis end time (Loggers off / instrument interference).
+
+—- Oceano 5/28/15 —-
+SALTATION (VERY WEAK)
+Raleigh and Livia in field.  Left in middle of day to visit Oso Flaco lake.
+11:30: Analysis start time (All loggers synced except C, end of instrument interference)
+BSNE interval (use for ultrasonics): 11:49 - 17:12
+12:19: Start time for dust sensors
+?: Analysis end time
+17:24: Wenglor/BSNE surface sample
+
+—- Oceano 5/29/15 —-
+NO SALTATION
+Raleigh and Livia to field in morning to start instruments.  Arkayan and Livia to field in afternoon to stop instruments, collect data.  Moved three lowest dust sensors away from tower to see if reducing interference with other instruments will yield better profiles.
+Moved U1 ultrasonic to new (larger y, smaller z) position.  Also moved A1 BSNE to new (smaller y) position.
+11:22: Sync time among all loggers except loggerC and CR1000PSU (synced at 11:44 and 12:09, respectively).  
+?: End time for instruments
+
+—- Oceano 5/30/15 —-
+NO SALTATION
+Raleigh and Livia to field in morning to start instruments.  Arkayan and Livia to field in afternoon to stop instruments, collect data.
+Sync time among loggers (except CR1000PSU, 10:21) at 10:10.
+Dust sensors on at 10:16.
+
+-- Oceano 5/31/15 --
+NO SALTATION
+Livia and Arkayan to field in morning to start instruments.  Raleigh and Arkayan to field in afternoon to stop instruments, collect data.
+
+
+-- Oceano 6/1/15 --
+SALTATION
+Raleigh and Arkayan to field in morning to start instruments.  Raleigh and Arkayan to field in afternoon to stop instruments, collect data.
+Wind today is mostly from WSW, there may be interference for BSNEs A2, A3, B2, B3
+10:10 AM -- surface samples
+10:23 AM -- all logger times synced
+15:35 PM -- all loggers off
+10:33 AM -- BSNE start
+15:00 PM -- BSNE end
+15:07 PM -- BSNE (false) start -- letting it run overnight, but not including in data because no other instruments are running
+15:30 PM -- surface samples
+
+-- Oceano 6/2/15 --
+SALTATION (Strong)
+Raleigh and Livia in field all day.  Very humid on arrival.  Soil wet just below surface.  Wenglors not functioning because of moisture buildup behind glass protective covers.
+10:41 AM -- All loggers (except CR1000PSU) synced.
+10:47 AM -- Dust sensors on
+10:30 AM -- Wenglor surface sand
+10:45 AM -- BSNE surface sand sample
+11:25 AM -- BSNE / ultrasonic start time
+!!! Issues with Wenglors due to water buildup.  Replaced bottom two (W1: 23 for R2, W2: 9 for R10).  Others slowly came back online as water evaporated (W3/W8/W9 working at 11:54 AM, W4 working at 12:14 PM, W7 working at 12:22 PM, W5/W6 working at 1:08 PM).  In analysis, only include Wenglors working at beginning of BSNE interval.
+11:54 AM -- Reset BSNEs, working Wenglors are W1/W2/W3/W8/W9
+U3 not working, tried diagnostics.  Came back to life on its own around 2 PM
+Due to interference, consider U4 starting at 12:32 PM
+1:11 PM - 1:16 PM -- Interference to recalibrate Wenglors, now have all working.
+2:24 PM - 2:28 PM -- Interference ot recalibrate Wenglors given possible drift due to further drying of water on lenses.
+
+Dust sensor 4 off at 5:30 PM
+Dust sensor 3 off from 5:30 - 5:31 PM during removal of dust sensor 4
+All dust sensors off at 6:14 PM
+Other loggers off at 6:16 PM
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INSTRUMENT SERIAL NUMBERS %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Wenglors
+9: ?
+14: ?
+19: ?
+21: ?
+23: ?
+R1: ?
+R2: ?
+R4: ?
+R5: ?
+R6: ?
+R7: ?
+R9: ?
+R10: ?
+
+Distance Sensors (Sick)
+L1: ?
+L2: ?
+
+Cups (Met One)
+C2: J3311
+C3: J3301
+C4: J3306
+C6: J8607
+
+Ultrasonics (RM Young)
+U1: 02379
+U2: ?
+U3: ?
+U4: 02354
+
+Sonics (Campbell CSAT)
+S1: 0370
+S2: 0367
+S3: 0377
+S4: 0369
+S5: 0274
+S6: 1099
+
+Loggers
+loggerA (CR1000): 15689
+loggerB (CR1000): 22180
+loggerC (CR1000): 63275
+loggerD (CR1000): 22179
+loggerE (CR1000): 3409
+CR1000PSU (CR1000): 3337
+MasterPSU (CR3000): 3274
+SlavePSU (CR3000): 4891
+
+Dust sensors
+D1: 9287 (5/15 to 5/27, when it appeared to be giving too high numbers), 9281 (5/28/15), 9284 (starting 5/29)
+D2: 9286 (up to 5/25/15, when it started malfunctioning), 9278 (5/26/15 to 5/28/15), 9290 (starting 5/29)
+D3: 9278 (up to 5/25/15), 9290 (up to 5/28/15), 9281 (starting 5/29)
+D4: 9284 (5/19 to 5/28/15), 9278 (starting 5/29)

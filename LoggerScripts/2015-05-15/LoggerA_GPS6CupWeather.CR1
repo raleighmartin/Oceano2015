@@ -1,0 +1,128 @@
+'LOGGER A - instruments measure at 1 Hz
+'1 weather station - SE1 (temperature) and SE2 (humidity) - log at 1/minute
+'6 cup anemometers - C1-6 - log at 1 Hz
+'GPS - for time communication
+'record battery voltage at 1/minute
+'writing directly to datalogger - no card
+
+'DATALOGGER PROGRAM SETUP
+'Force the logger to run in pipeline mode
+PipeLineMode
+
+'VARIABLES
+'Battery
+Public Batt_Volt
+
+'Weather variables
+Public TEMP
+Public HUM
+
+'Wind variables
+Public C1
+Public C2
+Public C3
+Public C4
+Public C5
+Public C6
+
+'UNITS
+Units Batt_Volt=Volts
+Units TEMP=C
+Units HUM=percent
+Units C1=m/s
+Units C2=m/s
+Units C3=m/s
+Units C4=m/s
+Units C5=m/s
+Units C6=m/s
+
+'VARIABLES FOR GPS (timing)
+Dim nmea_sentence(4) As String * 82
+Dim gps_data(30)
+
+'DATA TABLES
+
+'Battery data
+DataTable (loggerA_battery,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every minute
+	DataInterval(0,1,Min,10)
+	Minimum(1,Batt_Volt,FP2,False,False)
+EndTable
+
+'Weather data
+DataTable(loggerA_weather,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+
+	'Set the environmental logging interval here
+	DataInterval(0,1,Min,10)
+	
+	'Average of temperature readings
+	Average(1,TEMP,FP2,False)
+	
+	'Average of relative humidity readings
+	Average(1,HUM,FP2,False)
+EndTable
+
+'Cup anemometers
+DataTable(loggerA_wind,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+
+	'log every second
+	DataInterval(0,1,Sec,10)
+	Average(1,C1,FP2,False)
+	Average(1,C2,FP2,False)
+	Average(1,C3,FP2,False)
+	Average(1,C4,FP2,False)
+	Average(1,C5,FP2,False)
+	Average(1,C6,FP2,False)
+EndTable
+
+'Main Program
+BeginProg
+	
+	Scan(1,Sec,1,0)
+		'GPS timing data
+		GPS(gps_data(1),Com4,0,0,nmea_sentence(1))
+		
+		'Default Datalogger Battery Voltage measurement Batt_Volt:
+		Battery(Batt_Volt)
+		
+		'Generic Single-Ended Voltage measurements TEMP:
+		VoltSE(TEMP,1,mV2500,1,True,0,_60Hz,0.1,-40.0)
+		
+		'Generic Single-Ended Voltage measurements HUM: 
+		VoltSE(HUM,1,mV2500,2,True,0,_60Hz,0.1,0) 
+		If (HUM>100) And (HUM<108) Then HUM=100
+
+		'034A/034B Wind Speed & Direction Sensor:
+		PulseCount(C1,1,11,2,1,0.799,0.2811)
+		If C1=0.2811 Then C1=0
+		
+		'014A Wind Speed Sensor:
+		PulseCount(C2,1,12,2,1,0.8,0.447)
+		If C2<0.457 Then C2=0
+		
+		'014A Wind Speed Sensor:
+		PulseCount(C3,1,13,2,1,0.8,0.447)
+		If C3<0.457 Then C3=0
+		
+		'014A Wind Speed Sensor:
+		PulseCount(C4,1,14,2,1,0.8,0.447)
+		If C4<0.457 Then C4=0
+		
+		'014A Wind Speed Sensor:		
+		PulseCount(C5,1,15,2,1,0.8,0.447)
+		If C5<0.457 Then C5=0
+		
+		'014A Wind Speed Sensor:
+		PulseCount(C6,1,16,2,1,0.8,0.447)
+		If C6<0.457 Then C6=0
+		
+		'Call Data Tables and Store Data
+		CallTable(loggerA_battery)
+		CallTable(loggerA_weather)
+		CallTable(loggerA_wind)
+	NextScan
+	
+EndProg

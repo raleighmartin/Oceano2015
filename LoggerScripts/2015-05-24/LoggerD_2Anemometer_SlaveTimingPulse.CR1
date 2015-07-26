@@ -1,0 +1,187 @@
+'LOGGER D - measure at 25 Hz
+'2 sonic anemometers - COM1-2
+'1 GPS timing pulse - C7-C8
+'record battery voltage at 1/minute
+'Slave pulse received in P1
+
+'DATALOGGER PROGRAM SETUP
+'Force the logger to run in pipeline mode
+PipeLineMode
+
+'Setup the program constants
+Const SCAN_INTERVAL = 40     'set the scan interval here in mSec
+Const ANEMO_RATE = 32        'set the anemo output rate in Hz
+
+'The serial buffer stores the serial data as it floats in from the anemometer
+'Then the program samples the latest, but the buffer is necessary to float the data
+'Minimum serial buffer size is 37 bytes/record * 
+'(Ceiling (anemometer rate * SCAN_INTERVAL / 1000)) + 50 bytes/record extra + 1 bytes.
+Const SERIAL_BUFF_SIZE = 37*(Ceiling (ANEMO_RATE*SCAN_INTERVAL/1000))+37+1
+
+'Set the number of bytes expected in each string, this can be adjusted according
+'to what the serial output from the anemometer is.
+'Serial output from the anemometer is:
+'  -0.03   0.00   0.02   21.49   0<CR>
+Const NMBR_BYTES_EXPCTD = 33
+
+
+'VARIABLES
+'Battery
+Public Batt_Volt
+
+'sonics: [u v w temp errorcode]
+'Set an array of 5 to store the serial string that comes in from the anemometers
+'Alias some extra names for calling in the data table
+Public wind_3(5)
+Alias wind_3(1) = u_3
+Alias wind_3(2) = v_3
+Alias wind_3(3) = w_3
+Alias wind_3(4) = T_3
+Alias wind_3(5) = diag_sonic_3
+
+Public wind_4(5)
+Alias wind_4(1) = u_4
+Alias wind_4(2) = v_4
+Alias wind_4(3) = w_4
+Alias wind_4(4) = T_4
+Alias wind_4(5) = diag_sonic_4
+
+'Set a variable to hold the bytes coming in from the sonics (2-3)
+Public in_bytes_str_3 As String * NMBR_BYTES_EXPCTD
+Public in_bytes_str_4 As String * NMBR_BYTES_EXPCTD
+
+'Set diagnostic out byte variables
+Public num_bytes_out_3 As Long
+Public num_bytes_out_4 As Long
+
+'Variables for GPS (time)
+Dim nmea_sentence(4) As String * 82
+Dim gps_data(30)
+
+'Sync slave output
+Dim sync_slave
+Public SYNC_D_IN As Boolean
+
+'UNITS
+Units Batt_Volt=Volts
+Units u_3=m/s
+Units v_3=m/s
+Units w_3=m/s
+Units T_3=C
+Units u_4=m/s
+Units v_4=m/s
+Units w_4=m/s
+Units T_4=C
+
+
+'DATA TABLES
+
+'Anemometers
+DataTable (loggerD_anemometers,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log at specified data interval
+	DataInterval (0,SCAN_INTERVAL,mSec,10)
+
+	'sample the sonics
+	Sample (1,u_3,FP2)
+	Sample (1,v_3,FP2)
+	Sample (1,w_3,FP2)
+	Sample (1,T_3,FP2)
+	Sample (1,u_4,FP2)
+	Sample (1,v_4,FP2)
+	Sample (1,w_4,FP2)
+	Sample (1,T_4,FP2)
+EndTable
+
+
+'Battery data
+DataTable (loggerD_battery,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every minute
+	DataInterval(0,1,Min,10)
+	Minimum(1,Batt_Volt,FP2,False,False)
+EndTable
+
+
+'Slave pulse receipt
+DataTable (loggerD_slave,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every scan interval
+	DataInterval (0,SCAN_INTERVAL,mSec,10)
+
+	'Sample the slave flag
+	Sample (1,SYNC_D_IN,Boolean)
+EndTable
+
+
+'MAIN PROGRAM
+BeginProg
+	
+	'Open serial port(s) for comms (COM1 - COM2)
+	SerialOpen (Com1,38400,3,0,SERIAL_BUFF_SIZE)
+	SerialOpen (Com2,38400,3,0,SERIAL_BUFF_SIZE)
+
+	'Set scanning interval, leave buffer overload to 20
+	Scan (SCAN_INTERVAL,mSec,20,0)	  
+	
+		'Get GPS (timing)
+		GPS (gps_data(1),Com4,0,0,nmea_sentence(1))	
+	  	  
+		'Portset SW12V to high (connect sonic(s) to SW12V)
+		PortSet (9,1)
+		
+		'Sample the slave channel for timing pulses
+		PulseCount (sync_slave,1,1,0,0,1.0,0)
+
+		'Call table if true
+		If sync_slave=1 Then
+			SYNC_D_IN=True
+			CallTable (loggerD_slave)
+		EndIf
+
+		'Sonic serial Comms, SONIC 3 (COM1)
+		SerialInRecord (Com1,in_bytes_str_3,0,NMBR_BYTES_EXPCTD,&h0D,num_bytes_out_3,01)
+	
+		'Split the string and convert it into floats
+		SplitStr (wind_3, in_bytes_str_3,"",5,0)
+	
+		'Next, check the error code
+		If diag_sonic_3 <> 0 Then
+		  u_3=-999
+		  v_3=-999
+		  w_3=-999
+		  T_3=-999
+		EndIf
+		
+		'Sonic serial Comms, SONIC 4 (COM2)
+		SerialInRecord (Com2,in_bytes_str_4,0,NMBR_BYTES_EXPCTD,&h0D,num_bytes_out_4,01)
+	
+		'Split the string and convert it into floats
+		SplitStr (wind_4,in_bytes_str_4,"",5,0)
+	
+		'Next, check the error code
+		If diag_sonic_4 <> 0 Then
+		  u_4=-999
+		  v_4=-999
+		  w_4=-999
+		  T_4=-999
+		EndIf
+	
+		'Call Output Tables
+		CallTable (loggerD_anemometers)  
+
+	NextScan
+
+	
+	'Battery slow sequence scan
+	SlowSequence
+		Scan (60,Sec,10,0)
+			'Default Datalogger Battery Voltage measurement Batt_Volt:
+			Battery(Batt_Volt)
+			
+			'Call the table to record voltages
+			CallTable (loggerD_battery)
+		NextScan
+	EndSequence
+  	
+EndProg

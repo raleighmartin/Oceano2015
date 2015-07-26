@@ -1,0 +1,238 @@
+'CR1000-PSU - instruments measure at 1 Hz
+'1 weather station - SE1 (temperature) and SE2 (humidity) - log at 1/minute
+'6 cup anemometers - C1-4 - log at 1 Hz
+'dust sensor in COM3
+'GPS - for time communication
+'record battery voltage at 1/minute
+'writing directly to datalogger - no card
+'Slave pulse received in P1
+
+'DATALOGGER PROGRAM SETUP
+'Force the logger to run in pipeline mode
+PipeLineMode
+
+'VARIABLES
+'Battery
+Public Batt_Volt
+
+'Weather variables
+Public TEMP
+Public HUM
+
+'Wind variables
+Public C1
+Public C2
+Public C3
+Public C4
+Public C5
+Public C6
+
+Public dust_4(13)
+Alias dust_4(1) = time_4
+Alias dust_4(2) = bin1_4
+Alias dust_4(3) = bin2_4
+Alias dust_4(4) = bin3_4
+Alias dust_4(5) = bin4_4
+Alias dust_4(6) = bin5_4
+Alias dust_4(7) = bin6_4
+Alias dust_4(8) = bin7_4
+Alias dust_4(9) = bin8_4
+Alias dust_4(10) = diag_4
+Alias dust_4(11) = flow_4
+Alias dust_4(12) = temp_4
+Alias dust_4(13) = rh_4
+
+Public in_bytes_str_4 As String * 100
+Public num_bytes_out_4 As Long
+
+'Sync
+Dim sync_slave 'Return pulse
+Public SYNC_CR1000PSU_IN As Boolean 'Record return pulse
+
+'UNITS
+Units Batt_Volt=Volts
+Units TEMP=C
+Units HUM=percent
+Units C1=m/s
+Units C2=m/s
+Units C3=m/s
+Units C4=m/s
+Units C5=m/s
+Units C6=m/s
+
+Units time_4 = sec
+Units bin1_4 = counts
+Units bin2_4 = counts
+Units bin3_4 = counts
+Units bin4_4 = counts
+Units bin5_4 = counts
+Units bin6_4 = counts
+Units bin7_4 = counts
+Units bin8_4 = counts
+Units flow_4 = LPM
+Units temp_4 = oC
+Units rh_4 = perc
+
+'VARIABLES FOR GPS (timing)
+'Dim nmea_sentence(4) As String * 82
+'Dim gps_data(30)
+
+'DATA TABLES
+
+'Battery data
+DataTable (loggerA_battery,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every minute
+	DataInterval(0,1,Min,10)
+	Minimum(1,Batt_Volt,FP2,False,False)
+EndTable
+
+'Weather data
+DataTable(loggerA_weather,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+
+	'Set the environmental logging interval here
+	DataInterval(0,1,Min,10)
+	
+	'Average of temperature readings
+	Average(1,TEMP,FP2,False)
+	
+	'Average of relative humidity readings
+	Average(1,HUM,FP2,False)
+EndTable
+
+'Cup anemometers
+DataTable(loggerA_wind,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+
+	'log every second
+	DataInterval(0,1,Sec,10)
+	Average(1,C1,FP2,False)
+	Average(1,C2,FP2,False)
+	Average(1,C3,FP2,False)
+	Average(1,C4,FP2,False)
+	Average(1,C5,FP2,False)
+	Average(1,C6,FP2,False)
+EndTable
+
+
+'Dust Sensor
+DataTable (dust,1,-1)
+CardOut(0,-1) 'Specify to send data to card                                                '??????????????????????
+	'Log at specified data interval
+	DataInterval (0,1,sec,0)
+
+	'sample the sensors
+	Sample (1,bin1_4,UINT2)                                                                   '??????????????????????
+  Sample (1,bin2_4,UINT2)
+	Sample (1,bin3_4,UINT2)
+	Sample (1,bin4_4,UINT2)
+	Sample (1,bin5_4,UINT2)
+	Sample (1,bin6_4,UINT2)
+	Sample (1,bin7_4,UINT2)
+	Sample (1,bin8_4,UINT2)
+	Sample (1,diag_4,UINT2)
+	Sample (1,flow_4,FP2)
+	Sample (1,temp_4,FP2)
+	Sample (1,rh_4,FP2)
+
+EndTable
+
+
+'Slave pulse receipt
+DataTable (CR1000PSU_slave,1,-1)
+CardOut(0,-1) 'Specify to send data to card
+	'Log every second
+	DataInterval (0,1,Sec,10)
+
+	'sample the sync channel, True means a sync signal was outputted
+	Sample (1,SYNC_CR1000PSU_IN,Boolean)
+EndTable
+
+
+'Main Program
+BeginProg
+	
+	'Open serial port(s) for comms (COM1 - COM3)
+	SerialOpen (Com3,9600,0,0,100)
+	
+  'Command to start the dust sensor
+  SerialOut(Com3,"S","",0,1)	
+  
+	Scan(1,Sec,1,0)
+		'GPS timing data
+		'GPS(gps_data(1),Com4,0,0,nmea_sentence(1))
+		
+		'Default Datalogger Battery Voltage measurement Batt_Volt:
+		Battery(Batt_Volt)
+		
+		'Generic Single-Ended Voltage measurements TEMP:
+		VoltSe(TEMP,1,mV2500,1,True,0,_60Hz,0.1,-40.0)
+		
+		'Generic Single-Ended Voltage measurements HUM: 
+		VoltSe(HUM,1,mV2500,2,True,0,_60Hz,0.1,0) 
+		If (HUM>100) AND (HUM<108) Then HUM=100
+
+		'034A/034B Wind Speed & Direction Sensor:
+		'PulseCount(C1,1,11,2,1,0.799,0.2811)
+		'If C1=0.2811 Then C1=0
+		
+		'014A Wind Speed Sensor:
+		PulseCount(C2,1,12,2,1,0.8,0.447)
+		If C2<0.457 Then C2=0
+		
+		'014A Wind Speed Sensor:
+		PulseCount(C3,1,13,2,1,0.8,0.447)
+		If C3<0.457 Then C3=0
+		
+		'014A Wind Speed Sensor:
+		PulseCount(C4,1,14,2,1,0.8,0.447)
+		If C4<0.457 Then C4=0
+		
+		'014A Wind Speed Sensor:		
+		'PulseCount(C5,1,15,2,1,0.8,0.447)
+		'If C5<0.457 Then C5=0
+		
+		'014A Wind Speed Sensor:
+		PulseCount(C6,1,11,2,1,0.8,0.447)
+		If C6<0.457 Then C6=0
+		
+		'Sensor serial Comms, DUST 1 (COM1)
+		SerialInRecord (Com3,in_bytes_str_4,10,0,13,num_bytes_out_4,01)
+	
+		'Split the string and convert it into floats
+		SplitStr (dust_4,in_bytes_str_4,"",13,0)
+	
+		'Next, check the error code
+		If diag_4 > 0 Then
+		  bin1_4=-99
+		  bin2_4=-99
+		  bin3_4=-99
+		  bin4_4=-99
+		  bin5_4=-99
+		  bin6_4=-99
+		  bin7_4=-99
+		  bin8_4=-99
+		  flow_4=-99
+		  temp_4=-99
+		  rh_4=-99
+		EndIf
+
+		
+		'Call Data Tables and Store Data
+		CallTable(loggerA_battery)
+		CallTable(loggerA_weather)
+		CallTable(loggerA_wind)
+		CallTable(dust)
+		
+		'Sample the slave channel for timing pulses
+		PulseCount (sync_slave,1,1,0,0,1.0,0)
+		
+		'Convert to boolean if not true
+		If sync_slave=1 Then
+			SYNC_CR1000PSU_IN=True
+			CallTable (CR1000PSU_slave)
+		EndIf
+	NextScan
+	
+EndProg

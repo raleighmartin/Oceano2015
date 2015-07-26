@@ -1,0 +1,211 @@
+--------------------------
+--Key to WeightBSNE.xlsx--
+--------------------------
+Site = Location name for field deployment
+Date = Date of instrument setup
+StartTime = Time when trap was opened
+EndTime = Time when trap was closed
+NameBSNE = Name assigned to BSNE within array
+Weight_g = Weight of sample (g)
+WeightErr_g = Estimated error associated with weight (g)
+BottomHeight_cm = Height of bottom of opening (cm)
+BottomHeightErr_cm = Uncertainty in BSNE heights related to measurement over rough bed and changes in height with time = +/- 0.5 cm
+HeightBSNE_cm = Height of BSNE opening (cm).  5 cm for standard BSNE, 1 cm for modified BSNE.
+WidthBSNE_cm = Width of BSNE opening (cm). 2 cm for both kinds of BSNEs.
+Longitudinal_m = Downwind distance of BSNE relative to Wenglor / sonic colocation point (m)
+Spanwise_m = Spanwise distance of BSNE direction relative to Wenglor / sonic colocation point (m)
+ErrorCode = 0 if no problems with data.  = 1 if problems suspected.  Assign ErrorCode = 1 to all samples with mass less than 0.1 g.
+StartTime_GrainsSize = start time of associated grain size sample for trap (may combine multiple time intervals)
+EndTime_GrainSize = end time of associated grain size sample for trap (may combine multiple time intervals)
+
+----------------------------
+—-Deployment general notes—-
+----------------------------
+--Measurement of BSNE bottom heights--
+This was performed generally at beginning and end of each deployment day.  For each time interval, the bottom height used in the calculation is an interpolation between the bottom height measured at the beginning of the day and at the end of the day.
+
+--Calculation of BSNE midpoint--
+Midpoint is calculated as geometric mean height of BSNE opening
+(i.e. sqrt(BottomHeight*(BottomHeight+HeightBSNE)))
+
+--Uncertainty in BSNE weights--
+Tare weight uncertainty = +/- 0.1 g
+Sample weight uncertainty = +/- 0.2 g
+Total uncertainty = +/- 0.3 g
+Additional uncertainty from trap functioning and efficiency of sample transfer to plastic bags.
+
+--------------------
+--Day by day notes--
+--------------------
+
+-- Oceano, 5/15/15 --
+First sample started before beginning of saltation
+
+BSNE bottom hts (cm) measured at start of day (~11:45 AM): A1=10, A2=38, B1=15, B2=49, C1=22.5, C2=68, D1=6 (modified BSNE), D2=29.
+
+BSNE bottom hts (cm) measured at 3:39 PM: A1=10.5, A2=38.5, B1=15, B2=49, C1=22.5, C2=68, D1=6 (modified BSNE), D2=29.
+
+BSNE heights adjusted.  New BSNE bottom heights (cm) measured at 3:39 PM: A1=6, A2=34, B1=10, B2=44, C1=17.5, C2=63, D1=5.5 (modified BSNE), D2=28.5.
+
+No further measurements of BSNE heights today.  Heights of subsequent samples estimated by linear interpolation to next measurement on morning of 5/16/15.
+
+Final sample (begun at 7:02 PM) was left to run overnight.  End time of 8:15 PM was estimated based on latest time of saltation detected overnight, but sample was actually collected at ~10 AM on 5/16/15.
+
+BSNE bottom heights (cm) measured at ~10 AM on 5/16/15: A1=1, A2=34, B1=9, B2=43, C1=16.5, C2=62, D1=5, D2=28.
+
+Designation of BSNE names for 5/15/15 was based on instruments mounted on the same pole.  
+
+A1/2 and B1/2 were on the left of the tower (if looking from upwind) while C1/2 and D1/2 were on the right of the tower (if looking from upwind).
+
+*Possible issues with sample begun at 7:02 PM:
+A1 was mounted upside-down, but amount of sample collected was relatively small compared to trap size, so this probably didn’t have an effect.
+A2, B1, B2, and C1 seemed to have significant water in sample from condensation when collected on 5/16/15.  Effect strongest for A2 and B2 due to small sample sizes.
+
+Surface sand samples collected at ~18:05: BSNE A1/2, BSNE B1/2, BSNE C1/2, BSNE D1/2, Wenglor (18:10)
+
+
+-- Oceano, 5/16/15 --
+Surface sand samples collected at ~10:30 AM (before BSNE reconfiguration): BSNE A1/2, BSNE B1/2, Wenglor, BSNE C1/2, BSNE D1/2
+
+BSNE bottom heights (cm) measured at ~10 AM on 5/16/15: A1=1, A2=34, B1=9, B2=43, C1=16.5, C2=62, D1=5, D2=28.
+
+Reconfigured BSNEs today so that heights are lower.  BSNE’s A1, A2, A3, and A4 are to left of tower when looking from upwind, while B1, B2, B3, and B4 are to the right.  All BSNEs have their own pole, except for B2 and B3 which share a single pole.  Also, B2 is a modified BSNE.
+
+First sample started before beginning of saltation at 11:30 AM.  Bottom heights (cm) at this time were: A1 = 18, A2 = 23.5, A3 = 6.5, A4 = 12, B1 = 14, B2 = 9, B3 = 30, B4 = 9.5.
+Bottom heights (cm) at 7 PM were: A1 = 13, A2 = 23.5, A3 = 7.5, A4 = 13, B1 = 13, B2 = 9, B3 = 30, B4 = 9.
+
+*A bit of extra sand fell into A3 during first sample interval of day during collection, but it appeared to be relatively small compared to total sample mass.
+
+*Possible issues with A1 for last sample interval due to unknown sinking of BSNE pipe into ground.
+
+Surface sand samples collected at ~18:30: A1, A2, A3, A4, Wenglor (18:00), B1, B2/3, B4
+
+
+-- Oceano, 5/18/15 --
+Surface sand samples collected at ~10:30: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+First BSNE sample started before beginning of saltation at 11 AM.  Bottom heights (cm) at this time were: A1 = 18, A2 = 23, A3 = 6, A4 = 12.5, B1 = 10, B2 = 6.5, B3 = 29, B4 = 8.5.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+Bottom heights (cm) at ~17:45 PM were: A1 = 17, A2 = 22.5, A3 = 5, A4 = 11.5, B1 = 10, B2 = 6, B3 = 28, B4 = 8.
+
+Surface sand samples collected at ~18:00: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+
+-- Oceano, 5/19/15 --
+Surface sand samples collected at 10:00: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+First sample started before beginning of saltation at 11:30 AM.  Bottom heights (cm) at this time were: A1 = 17, A2 = 23.5, A3 = 6, A4 = 12.5, B1 = 10, B2 = 6.5, B3 = 29.5, B4 = 8.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+Bottom heights (cm) at 5:32 PM were: A1 = 15.5, A2 = 21.5, A3 = 6, A4 = 10.5, B1 = 9.5, B2 = 6.5, B3 = 29.5, B4 = 9.0.
+
+*First transport detected at 12:40:11 PM, but BSNE was opened at 11:30 AM.  Set start time in BSNE metadata file as 12:40 PM, because there were issues with missing records (power issues?) in loggerA
+
+Surface sand samples collected at 17:48: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+
+-- Oceano, 5/23/15 --
+
+Surface sand samples collected at 11:00 on 5/22 (but no saltation subsequent to this): A1, A2, A3, A4, Wenglor, B1, B2/3, B4, so use these as initial surface sizes for 5/23/15
+
+BSNE heights (cm) at 10:15 AM were: A1 = 17, A2 = 22, A3 = 7, A4 = 11, B1 = 13, B2 = 6, B3 = 28.5, B4 = 9.0.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+BSNE heights (cm) at 6:30 PM were: A1 = 18, A2 = 23, A3 = 7.5, A4 = 10.5, B1 = 13, B2 = 6.5, B3 = 29.5, B4 = 8.5.
+
+Surface sand samples collected at 18:40: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+
+-- Oceano, 5/24/15 --
+
+Surface sand samples collected at 11:30: A1, A2, A3, A4, Wenglor (11:15), B1, B2/3, B4
+
+BSNE heights (cm) at 11:40 AM were: A1 = 18.5, A2 = 22.5, A3 = 7.0, A4 = 10.5, B1 = 12.5, B2 = 6.5, B3 = 29.0, B4 = 8.0.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+BSNE heights (cm) at 5:00 PM were: A1 = 18.0, A2 = 23.5, A3 = 8.0, A4 = 10.5, B1 = 12.5, B2 = 6.5, B3 = 29.0, B4 = 9.0.
+
+Surface sand samples collected at 17:00: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+
+-- Oceano, 5/27/15 --
+
+Surface sand samples collected at 10:40: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+BSNE heights (cm) at 11 AM were: A1 = 18.5, A2 = 23.5, A3 = 6.5, A4 = 10, B1 = 12.5, B2 = 6, B3 = 28.5, B4 = 9.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+BSNE heights (cm) at 6 PM were: A1 = 20.0, A2 = 24, A3 = 7.5, A4 = 10.5, B1 = 13, B2 = 6, B3 = 28.5, B4 = 9.5.
+
+Surface sand samples collected at 18:00: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+
+-- Oceano, 5/28/15 --
+
+Surface sand samples collected at 11:45: A1, A2, A3, A4, Wenglor (11:30), B1, B2/3, B4
+
+BSNE heights (cm) at 11:30 AM were: A1 = 19, A2 = 23.5, A3 = 7.5, A4 = 10, B1 = 13, B2 = 6, B3 = 28.5, B4 = 9.5.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+BSNE heights (cm) at 5:30 PM were: A1 = 19, A2 = 23.5, A3 = 7.5, A4 = 10.5, B1 = 13, B2 = 6, B3 = 28.5, B4 = 9.5.
+
+Surface sand samples collected at 17:24: A1, A2, A3, A4, Wenglor (11:30), B1, B2/3, B4
+
+
+-- Oceano, 6/1/15 --
+
+Surface sand samples collected at 10:10 AM: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+BSNE heights (cm) at 10:30 AM were: A1 = 19, A2 = 23.5, A3 = 7.5, A4 = 10.5, B1 = 12.5, B2 = 6, B3 = 28.5, B4 = 9.5.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+BSNE heights (cm) at 3:30 PM were: A1 = 19.5, A2 = 23.5, A3 = 7.5, A4 = 10.5, B1 = 13, B2 = 6, B3 = 28.5, B4 = 9.5.
+
+Surface sand samples collected at 15:30: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+
+-- Oceano, 6/2/15 --
+
+Surface sand samples collected at 10:45: A1, A2, A3, A4, Wenglor (10:30), B1, B2/3, B4
+
+BSNE bottom heights (cm) at 11:20 AM were: A1 = 16, A2 = 21, A3 = 7.5, A4 = 10.5, B1 = 13, B2 = 6, B3 = 28.5, B4 = 8.5.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+BSNE bottom heights (cm) at 6:10 PM were: A1 = 15.5, A2 = 20.5, A3 = 7, A4 = 10.5, B1 = 13.5, B2 = 6, B3 = 28.5, B4 = 9.5.
+
+Surface sand samples collected at 18:05: A1, A2, A3, A4, Wenglor (18:20), B1, B2/3, B4
+
+
+-- Oceano, 6/3/15 --
+
+Surface sand samples collected at 10:12: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+BSNE heights (cm) at 10:30 AM were: A1 = 16.5, A2 = 20, A3 = 8.5, A4 = 12, B1 = 14, B2 = 6.5, B3 = 29.5, B4 = 10.5.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+BSNE heights (cm) at 6:20 PM were: A1 = 15, A2 = 19.5, A3 = 7.5, A4 = 10, B1 = 13.5, B2 = 8, B3 = 31.5, B4 = 11.5.
+
+Surface sand samples collected at 18:30: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+
+-- Oceano, 6/4/15 --
+
+Surface sand samples collected at 10:50: A1, A2, A3, A4, Wenglor, B1, B2/3, B4
+
+BSNE heights (cm) at 11:10 AM were: A1 = 16.5, A2 = 19, A3 = 8.5, A4 = 12, B1 = 14, B2 = 7.5, B3 = 30.5, B4 = 10.5.
+
+BSNE heights for intervening intervals estimated from linear interpolation.
+
+BSNE heights (cm) at 3:10 PM were: A1 = 16, A2 = 19, A3 = 8.5, A4 = 12, B1 = 14, B2 = 7.5, B3 = 30.5, B4 = 11.
+
+Surface sand samples collected at 15:20: A1, A2, A3, A4, Wenglor, B1, B2/3, B4

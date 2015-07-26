@@ -1,0 +1,85 @@
+Accompanying spreadsheet (InstrumentMetadata.xlsx) gives intervals of instrument data collection for each instrument.  Set aside distinctive intervals to block out times of continuous “good” data without interference or malfunction effects.
+
+-- Spreadsheet fields --
+Site = name of field deployment location
+Date = date of field deployment interval
+StartTime = local time for beginning of instrumental record interval
+EndTime = local time for end of instrumental record interval
+InstrumentType = Type of instrument (useful for distinguishing processing required)
+Instrument = universal variable name(s) for instrument
+Variables = universal variable names(s) recorded by instrument
+StartHeight_m = height (m) of instrument as measured at beginning of interval
+EndHeight_m = height (m) of instrument as measured at end of interval (use same height if it was not measured)
+HeightErr_m = estimated error (+/-) in meters for stated instrument height
+HeightRef = 0 if height is relative to ground.  Otherwise, equals name of distance instrument to be used to compute height
+Longitudinal_m = downwind displacement of instrument (in m)
+Spanwise_m = spanwise displacement of instrument (in m)
+AngleErr_deg = angle of mismatch (in deg) between orientation of setup and actual wind.  Positive angle corresponds to shift of wind toward positive y according to right-hand rule.  Note that values in table are not corrected (i.e. assume perfect alignment of setup with wind), so script is required for subsequent correction of these values
+ErrorCode = 1 if a major problem is detected with instrument during time interval
+
+-- Coordinate scheme --
+x is streamwise (positive downwind)
+y is spanwise (positive according to right hand rule, to right if looking upwind)
+z is vertical (positive up)
+Orientation of setup (upwind direction) is 290 degrees (WNW)
+Campbell sonics set such that u is positive downwind, v is positive to NNE
+RM Young sonics set such that u is negative downwind, v is negative to NNE
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% INSTRUMENT POSITIONS %
+%%%%%%%%%%%%%%%%%%%%%%%%
+-- General notes --
+—- Campbell Sonics —-
+—- Cup anemometers —-
+—- Weather station —-
+—- Ultrasonic (RM Young) anemometers —-
+—- Dust sensors —-
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% NOTES, DAY BY DAY %%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+-- Oceano 6/5/15 —-
+-- Oceano 6/6/15 —-
+-- Oceano 6/7/15 —-
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INSTRUMENT SERIAL NUMBERS %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Cups (Met One)
+C2: J3311
+C3: J3301
+C4: J3306
+C6: J8607
+
+Ultrasonics (RM Young)
+U1: 02379
+U2: ?
+U3: ?
+U4: 02354
+
+Sonics (Campbell CSAT)
+S1: 0370
+S2: 0367
+S3: 0377
+S4: 0369
+S5: 0274
+S6: 1099
+
+Loggers
+loggerA (CR1000): 15689
+loggerB (CR1000): 22180
+loggerC (CR1000): 63275
+loggerD (CR1000): 22179
+loggerE (CR1000): 3409
+CR1000PSU (CR1000): 3337
+MasterPSU (CR3000): 3274
+SlavePSU (CR3000): 4891
+
+Dust sensors
+D1: 9284
+D2: 9290
+D3: 9281
+D4: 9278
+D5: 9287
