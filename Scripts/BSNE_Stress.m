@@ -3,13 +3,13 @@
 % 'MaxOverlappingInterval', 'reorient_anemometers_vanboxel2004'
 
 %%clear existing data and load processed data and metadata
-clear all;
-folder_ProcessedData = '../../../../../../../../Google Drive/Data/AeolianFieldwork/Processed/'; %folder for storing data output
-folder_Plots = '../PlotOutput/AnemometerProfiles/'; %folder for plots
+% clear all;
+folder_ProcessedData = '../../../Google Drive/Data/AeolianFieldwork/Processed/'; %folder for storing data output
+folder_Plots = '../PlotOutput/BSNE/'; %folder for plots
 saveMetadata_Path = strcat(folder_ProcessedData,'Metadata_Oceano'); %get path to saving meta data
 saveProcessedData_Path = strcat(folder_ProcessedData,'ProcessedData_Oceano'); %get path to saving processed data
 load(saveMetadata_Path); %load metadata
-load(saveProcessedData_Path); %load processed data
+% load(saveProcessedData_Path); %load processed data
 
 %set physical parameters
 rho_a = 1.23; %kg/m^3
@@ -56,6 +56,12 @@ z0_log_cal_list = zeros(N_Blocks,1); %calibrated z0 for log law
 ust_Re_list = zeros(N_Blocks,1); %u* for Reynolds stress
 ust_Re_cal_list = zeros(N_Blocks,1); %calibrated u* for Reynolds stress
 theta_list = zeros(N_Blocks,1); %wind angle list
+
+%initialize BSNE values
+Q_list = zeros(N_Blocks,1);
+zbar_list = zeros(N_Blocks,1);
+zbar_max_list = zeros(N_Blocks,1);
+zbar_min_list = zeros(N_Blocks,1);
 
 %go through each block
 for i = 1:N_Blocks
@@ -156,53 +162,147 @@ for i = 1:N_Blocks
     
     %get mean wind angle, add to list
     theta_list(i) = mean(theta_profile(~isnan(theta_profile)));
+    
+    %get BSNE values
+    BSNE_i = ProcessedData.BSNE(i);  
+    z = BSNE_i.z;
+    qz = BSNE_i.qz;
+    name = BSNE_i.name;
+    q0 = BSNE_i.q0;
+    Q = BSNE_i.Q;
+    zbar = BSNE_i.zbar.mid;
+    zbar_min = BSNE_i.zbar.min;
+    zbar_max = BSNE_i.zbar.max;
+    Q_time = mean([BSNE_i.StartTime; BSNE_i.EndTime]);
+    
+    %get fit values for mean, min, and max saltation heights
+    z_fit = linspace(0,max(z),50);
+    qz_fit = q0*exp(-z_fit/zbar);
+    q0_min = mean(qz./(exp(-z/zbar_min)));
+    qz_fit_min = q0_min*exp(-z_fit/zbar_min);
+    q0_max = mean(qz./(exp(-z/zbar_max)));
+    qz_fit_max = q0_max*exp(-z_fit/zbar_max);
+    
+    %plot profile
+    figure(1); clf;
+    
+    %plot actual values
+    semilogx(qz,z,'kx','MarkerSize',5); hold on;
+    text(qz,z,name);
+   
+    %plot fit profiles
+    plot(qz_fit,z_fit,'k')
+    plot(qz_fit_min,z_fit,'r');
+    plot(qz_fit_max,z_fit,'b');
+    
+    %plot mean heights
+    plot(q0*exp(-1),zbar,'k+','MarkerSize',10)
+    plot(q0_min*exp(-1),zbar_min,'r+','MarkerSize',10);
+    plot(q0_max*exp(-1),zbar_max,'b+','MarkerSize',10);    
+    
+    %label plot
+    title(datestr(Q_time_list(i)),'FontSize',16);
+    xlabel('flux (g/m/s^2)','FontSize',16);
+    ylabel('height (m)','FontSize',16);
+    print([folder_Plots,'/Profiles/FluxProfile_',datestr(Q_time,'yyyy-mm-dd_HHMM'),'.png'],'-dpng');
+    
+    %add values to lists
+    Q_list(i) = Q;
+    zbar_list(i) = zbar;
+    zbar_max_list(i) = zbar_max;
+    zbar_min_list(i) = zbar_min;
+    Q_time_list(i,1) = Q_time;
 end
 
-%get BSNE values
-Q = [ProcessedData.BSNE.Q]';
-zbar = [ProcessedData.BSNE.zbar]';
-BSNEtime = [ProcessedData.BSNE.StartTime]';
 
 %get indices only of intervals in +/- 45 degree angle
 onshorewind_ind = find(abs(theta_list)<=45);
 
 %plot BSNE fluxes versus shear velocity - calibrated Reynolds
 figure(1); clf;
-plot(ust_Re_list(onshorewind_ind),Q(onshorewind_ind),'o','MarkerSize',5);
+plot(ust_Re_list(onshorewind_ind),Q_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('u_{*,Re}');
 ylabel('Q_{BSNE} (g/m/s)');
+corr_matrix = corrcoef(ust_Re_list(onshorewind_ind),Q_list(onshorewind_ind));
+title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
 set(gca,'FontSize',16);
-print([folder_Plots,'ReynoldsBSNE_Uncalibrated.png'],'-dpng');
+print([folder_Plots,'ReynoldsUstBSNE_Uncalibrated.png'],'-dpng');
+
+%plot BSNE fluxes versus shear stress - calibrated Reynolds
+figure(1); clf;
+plot(rho_a*ust_Re_list(onshorewind_ind).^2,Q_list(onshorewind_ind),'o','MarkerSize',5);
+xlabel('\tau_{Re}');
+ylabel('Q_{BSNE} (g/m/s)');
+corr_matrix = corrcoef(ust_Re_list(onshorewind_ind).^2,Q_list(onshorewind_ind));
+title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
+set(gca,'FontSize',16);
+print([folder_Plots,'ReynoldsStressBSNE_Uncalibrated.png'],'-dpng');
 
 %plot BSNE fluxes versus shear velocity - calibrated Reynolds
 figure(2); clf;
-plot(ust_Re_cal_list(onshorewind_ind),Q(onshorewind_ind),'o','MarkerSize',5);
+plot(ust_Re_cal_list(onshorewind_ind),Q_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('u_{*,Re}','FontSize',14);
 ylabel('Q_{BSNE} (g/m/s)','FontSize',14);
+corr_matrix = corrcoef(ust_Re_cal_list(onshorewind_ind),Q_list(onshorewind_ind));
+title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
 set(gca,'FontSize',16);
+print([folder_Plots,'ReynoldsUstBSNE_Calibrated.png'],'-dpng');
 
-print([folder_Plots,'ReynoldsBSNE_Calibrated.png'],'-dpng');
+%plot BSNE fluxes versus shear stress - calibrated Reynolds
+figure(2); clf;
+plot(rho_a*ust_Re_cal_list(onshorewind_ind).^2,Q_list(onshorewind_ind),'o','MarkerSize',5);
+xlabel('\tau_{Re}','FontSize',14);
+ylabel('Q_{BSNE} (g/m/s)','FontSize',14);
+corr_matrix = corrcoef(ust_Re_cal_list(onshorewind_ind).^2,Q_list(onshorewind_ind));
+title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
+set(gca,'FontSize',16);
+print([folder_Plots,'ReynoldsStressBSNE_Calibrated.png'],'-dpng');
 
 %plot BSNE fluxes versus shear velocity - calibrated log
 figure(3); clf;
-plot(ust_log_list(onshorewind_ind),Q(onshorewind_ind),'o','MarkerSize',5);
+plot(ust_log_list(onshorewind_ind),Q_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('u_{*,log}');
 ylabel('Q_{BSNE} (g/m/s)');
+corr_matrix = corrcoef(ust_log_list(onshorewind_ind),Q_list(onshorewind_ind));
+title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
 set(gca,'FontSize',16);
-print([folder_Plots,'LogBSNE_Uncalibrated.png'],'-dpng');
+print([folder_Plots,'LogUstBSNE_Uncalibrated.png'],'-dpng');
+
+%plot BSNE fluxes versus shear stress - calibrated log
+figure(3); clf;
+plot(rho_a*ust_log_list(onshorewind_ind).^2,Q_list(onshorewind_ind),'o','MarkerSize',5);
+xlabel('\tau_{log}');
+ylabel('Q_{BSNE} (g/m/s)');
+corr_matrix = corrcoef(ust_log_list(onshorewind_ind).^2,Q_list(onshorewind_ind));
+title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
+set(gca,'FontSize',16);
+print([folder_Plots,'LogStressBSNE_Uncalibrated.png'],'-dpng');
 
 %plot BSNE fluxes versus shear velocity - uncalibrated log
 figure(4); clf;
-plot(ust_log_cal_list(onshorewind_ind),Q(onshorewind_ind),'o','MarkerSize',5);
+plot(ust_log_cal_list(onshorewind_ind),Q_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('u_{*,log,cal}');
 ylabel('Q_{BSNE} (g/m/s)');
+corr_matrix = corrcoef(ust_log_cal_list(onshorewind_ind),Q_list(onshorewind_ind));
+title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
 set(gca,'FontSize',16);
-print([folder_Plots,'LogBSNE_Calibrated.png'],'-dpng');
+print([folder_Plots,'LogUstBSNE_Calibrated.png'],'-dpng');
+
+%plot BSNE fluxes versus shear stress - uncalibrated log
+figure(4); clf;
+plot(rho_a*ust_log_cal_list(onshorewind_ind).^2,Q_list(onshorewind_ind),'o','MarkerSize',5);
+xlabel('\tau_{log,cal}');
+ylabel('Q_{BSNE} (g/m/s)');
+corr_matrix = corrcoef(ust_log_cal_list(onshorewind_ind).^2,Q_list(onshorewind_ind));
+title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
+set(gca,'FontSize',16);
+print([folder_Plots,'LogStressBSNE_Calibrated.png'],'-dpng');
 
 
 %plot flux heights versus shear velocity - calibrated Reynolds
 figure(5); clf;
-plot(ust_Re_list(onshorewind_ind),zbar(onshorewind_ind),'o','MarkerSize',5);
+errorbar(ust_Re_list(onshorewind_ind),zbar_list(onshorewind_ind),...
+    zbar_min_list(onshorewind_ind),zbar_max_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('u_{*,Re}');
 ylabel('z_{bar} (cm)');
 set(gca,'FontSize',16);
@@ -210,7 +310,8 @@ print([folder_Plots,'ReynoldsZbar_Uncalibrated.png'],'-dpng');
 
 %plot flux heights versus shear velocity - calibrated Reynolds
 figure(6); clf;
-plot(ust_Re_cal_list(onshorewind_ind),zbar(onshorewind_ind),'o','MarkerSize',5);
+errorbar(ust_Re_cal_list(onshorewind_ind),zbar_list(onshorewind_ind),...
+    zbar_min_list(onshorewind_ind),zbar_max_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('u_{*,Re}');
 ylabel('z_{bar} (cm)');
 set(gca,'FontSize',16);
@@ -218,7 +319,8 @@ print([folder_Plots,'ReynoldsZbar_Calibrated.png'],'-dpng');
 
 %plot flux heights versus shear velocity - calibrated log
 figure(7); clf;
-plot(ust_log_list(onshorewind_ind),zbar(onshorewind_ind),'o','MarkerSize',5);
+errorbar(ust_log_list(onshorewind_ind),zbar_list(onshorewind_ind),...
+    zbar_min_list(onshorewind_ind),zbar_max_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('u_{*,log}');
 ylabel('z_{bar} (cm)');
 set(gca,'FontSize',16);
@@ -226,7 +328,8 @@ print([folder_Plots,'LogZbar_Uncalibrated.png'],'-dpng');
 
 %plot flux heights versus shear velocity - uncalibrated log
 figure(8); clf;
-plot(ust_log_cal_list(onshorewind_ind),zbar(onshorewind_ind),'o','MarkerSize',5);
+errorbar(ust_log_cal_list(onshorewind_ind),zbar_list(onshorewind_ind),...
+    zbar_min_list(onshorewind_ind),zbar_max_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('u_{*,log,cal}');
 ylabel('z_{bar} (cm)');
 set(gca,'FontSize',16);
@@ -234,7 +337,7 @@ print([folder_Plots,'LogZbar_Calibrated.png'],'-dpng');
 
 %plot BSNE height versus BSNE time
 figure(9); clf;
-plot(BSNEtime,zbar,'o','MarkerSize',5);
+plot(Q_time_list(onshorewind_ind),zbar_list(onshorewind_ind),'o','MarkerSize',5);
 xlabel('time');
 ylabel('z_{bar} (cm)');
 set(gca,'FontSize',16);

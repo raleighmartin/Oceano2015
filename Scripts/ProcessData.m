@@ -9,7 +9,7 @@
 % Dependencies: NONE
 % Used by: Processing_Master
  
-function [ProcessedData] = ProcessData(InterpolatedData, WeightBSNE, InstrumentMetadata)
+function [ProcessedData] = ProcessData(InterpolatedData, WeightBSNE, InstrumentMetadata, GrainSize_BSNE, GrainSize_Surface)
 
 %% PARAMETERS
 %set time increment for TotalFlux calculations
@@ -89,7 +89,7 @@ end
 
 
 %% EXTRACT BSNE FLUX PROFILES BASED ON BSNE WEIGHTS
-ProfilesBSNE = ProcessBSNEs(WeightBSNE); %process BSNE data to get profile values
+ProfilesBSNE = ProcessBSNEs(WeightBSNE,GrainSize_BSNE,GrainSize_Surface); %process BSNE data to get profile values
 
 
 %% GO THROUGH BSNE PROFILES TO CALIBRATE WENGLOR COUNTS TO HEIGHT-SPECIFIC FLUXES
@@ -139,7 +139,7 @@ for i=1:length(ProfilesBSNE);
 
     %get BSNE flux information for time interval
     q0_BSNE = ProfilesBSNE(i).q0; %qz at 0, (g/m^2/s)
-    zbar_BSNE = ProfilesBSNE(i).zbar; %get mean BSNE height, (m)
+    zbar_BSNE = ProfilesBSNE(i).zbar.mid; %get mean BSNE height, (m)
     
     %create enlarged time intervals for calibrating Wenglor times outside of BSNE profile times
     if i == 1 %earliest start time is beginning of first BSNE day
@@ -377,3 +377,6 @@ ProcessedData.TotalFlux = TotalFlux;
 
 %add revised Wenglor structured array to processed data structured array
 ProcessedData.Wenglor = ProcessedWenglors;
+
+%add grain-size data to processed data structured array
+ProcessedData.GrainSize = struct('Surface',GrainSize_Surface,'BSNE',GrainSize_BSNE);

@@ -1,0 +1,6 @@
+Missing sample from grain size analysis:
+"Oceano_2015-05-27_BSNE_A4_1408_1608": Oceano, 2015-05-27, A4, 14:08-16:08, Box 1
+
+Potentially problematic sample from grain size analysis (lost some sample):
+"Oceano_2015-05-15_BSNE_A1_1902_2015": Oceano, 2015-05-15, A1, 19:02-20:15 (subsample), Box 1
+
