@@ -12,14 +12,15 @@ N_InstrumentTypes = length(InstrumentTypes); %how many instrument types
 
 for i = 1:N_InstrumentTypes
     InstrumentType = InstrumentTypes{i}; %get current instrument type 
-    Variables = unique(InstrumentVariables.VarNameGeneral(strcmp(InstrumentVariables.InstrumentType,InstrumentType))); %get variables for instrument type
-    N_Variables = length(Variables);
     Instruments = fieldnames(RawData.(InstrumentType)); %get list of instruments
     N_Instruments = length(Instruments); %how many instruments of this type
     
     for j = 1:N_Instruments
         Instrument = Instruments{j} %get current instrument
         N_Intervals = length(RawData.(InstrumentType).(Instrument)); %how many time intervals for this instrument
+        
+        Variables = unique(InstrumentVariables.VarNameGeneral(strcmp(InstrumentVariables.Instrument,Instrument))); %get variables for instrument
+        N_Variables = length(Variables);
         
         for k = 1:N_Intervals
             t_raw = RawData.(InstrumentType).(Instrument)(k).t.raw; %get raw times

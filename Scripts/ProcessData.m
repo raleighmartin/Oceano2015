@@ -80,9 +80,9 @@ for i = 1:N_InstrumentTypes
             InterpolatedData.(InstrumentType).(Instrument)(k).InstrumentHeight.Units = 'm';
         end
         
-    %reorder fields to move height column earlier in list
+    %reorder fields to move height column to beginning of list
     N_fields = length(fieldnames(InterpolatedData.(InstrumentType).(Instrument)));
-    InterpolatedData.(InstrumentType).(Instrument) = orderfields(InterpolatedData.(InstrumentType).(Instrument), [1,N_fields,2:(N_fields-1)]);        
+    InterpolatedData.(InstrumentType).(Instrument) = orderfields(InterpolatedData.(InstrumentType).(Instrument), [N_fields,1:(N_fields-1)]);        
     
     end
 end

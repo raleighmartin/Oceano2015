@@ -336,3 +336,6 @@ D1: 9287 (5/15 to 5/27, when it appeared to be giving too high numbers), 9281 (5
 D2: 9286 (up to 5/25/15, when it started malfunctioning), 9278 (5/26/15 to 5/28/15), 9290 (starting 5/29)
 D3: 9278 (up to 5/25/15), 9290 (up to 5/28/15), 9281 (starting 5/29)
 D4: 9284 (5/19 to 5/28/15), 9278 (starting 5/29)
+
+Weather station
+SN: 43282163 / 123443 (other numbers on instrument: 43935/0506, on cable: MOK3-02-XX, SN: 40467)
