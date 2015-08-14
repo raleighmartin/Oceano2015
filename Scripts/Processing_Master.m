@@ -38,21 +38,21 @@ save(Metadata_Path,'LoggerTables','LoggerTimes','InstrumentVariables',...
     'InstrumentMetadata','WeightBSNE','GrainSizeMetadata_Surface',...
     'GrainSizeMetadata_BSNE','-v7.3');
 
-% %% 3. Import and aggregate data from grain size files
+%% 3. Import and aggregate data from grain size files
 GrainSize_Surface = GetGrainSize(GrainSizeMetadata_Surface,folder_GrainSize);
 GrainSize_BSNE = GetGrainSize(GrainSizeMetadata_BSNE,folder_GrainSize);
 save(GrainSize_Path,'GrainSize_Surface','GrainSize_BSNE');
 
-% %% 4. Import and aggregate data from logger files
-% RawData = GetRawData(LoggerTables,LoggerTimes,InstrumentVariables,InstrumentMetadata,folder_LoggerRawData);
-% %save(RawData_Path,'RawData','-v7.3'); %save raw data
-% 
-% %% 5. Perform interpolation on raw data
-% %load(RawData_Path); %load raw data
-% InterpolatedData = InterpolateData(RawData, InstrumentVariables); %interpolate raw data, flag errors
-% %save(InterpolatedData_Path,'InterpolatedData','-v7.3');
-% 
-%% 6. Process BSNE profiles and interpolated data
+%% 4. Import and aggregate data from logger files
+RawData = GetRawData(LoggerTables,LoggerTimes,InstrumentVariables,InstrumentMetadata,folder_LoggerRawData);
+%save(RawData_Path,'RawData','-v7.3'); %save raw data
+
+%% 5. Perform interpolation on raw data
+%load(RawData_Path); %load raw data
+InterpolatedData = InterpolateData(RawData, InstrumentVariables); %interpolate raw data, flag errors
+%save(InterpolatedData_Path,'InterpolatedData','-v7.3');
+
+% 6. Process BSNE profiles and interpolated data
 %load(InterpolatedData_Path); %load interpolated data
-% ProcessedData = ProcessData(InterpolatedData, WeightBSNE, InstrumentMetadata, GrainSize_BSNE, GrainSize_Surface); %process data
-% save(ProcessedData_Path,'ProcessedData','-v7.3'); %save processed data
+ProcessedData = ProcessData(InterpolatedData, WeightBSNE, InstrumentMetadata, GrainSize_BSNE, GrainSize_Surface); %process data
+save(ProcessedData_Path,'ProcessedData','-v7.3'); %save processed data
