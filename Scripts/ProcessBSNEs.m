@@ -1,6 +1,6 @@
 %% function to take info about BSNE trap weights ('WeightBSNE') and grain sizes ('GrainSize_BSNE')
 % and aggregate this into mass and grain-size profiles
-% Dependencies: IntervalsStartsWithin, qzCalc, qz_profilefit
+% Dependencies: IntervalsStartsWithin, qzCalc, qz_profilefit_error
 % Used by: ProcessingData
 
 function ProfilesBSNE = ProcessBSNEs(WeightBSNE,GrainSize_BSNE,GrainSize_Surface)
@@ -98,7 +98,7 @@ for i = 1:N_Intervals;
     d_EndTime_profile = d_EndTime_profile(sort_ind);
     
     %height-integrated flux from exponential fit
-    [zbar,q0,Q] = qz_profilefit(z, qz, sigmaz, sigmaqz);
+    [zbar,q0,Q] = qz_profilefit_error(z, qz, sigmaz, sigmaqz);
  
     %put all surface and profile grain size values together into structured array
     %d_Surface = struct('d_10',
