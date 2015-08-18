@@ -1,25 +1,25 @@
 %% SCRIPT TO LOOK AT REYNOLDS VERSUS LOG LAW SHEAR STRESS
 
-% %% data loading -- can comment out if re-running script
-% %initialize
-% clear all;
-% 
-% %information about where to load data and save plots
-% folder_ProcessedData = '../../../Google Drive/Data/AeolianFieldwork/Processed/'; %folder for storing data output
-% folder_Plots = '../PlotOutput/vonKarman/'; %folder for plots
-% 
-% %information about sites for analysis
-% Sites = {'Jericoacoara','RanchoGuadalupe','Oceano'};
-% Markers = {'x','o','v'};
-% N_Sites = length(Sites);
-% 
-% for i = 1:N_Sites
-%     %load processed data
-%     ProcessedData_Path = strcat(folder_ProcessedData,'ProcessedData_',Sites{i});
-%     Metadata_Path = strcat(folder_ProcessedData,'Metadata_',Sites{i});
-%     Data{i} = load(ProcessedData_Path); %load processed data
-%     Metadata{i} = load(Metadata_Path); %load metadata
-% end
+%% data loading -- can comment out if re-running script
+%initialize
+clear all;
+
+%information about where to load data and save plots
+folder_ProcessedData = '../../../Google Drive/Data/AeolianFieldwork/Processed/'; %folder for storing data output
+folder_Plots = '../PlotOutput/vonKarman/'; %folder for plots
+
+%information about sites for analysis
+Sites = {'Jericoacoara','RanchoGuadalupe','Oceano'};
+Markers = {'x','o','v'};
+N_Sites = length(Sites);
+
+for i = 1:N_Sites
+    %load processed data
+    ProcessedData_Path = strcat(folder_ProcessedData,'ProcessedData_',Sites{i});
+    Metadata_Path = strcat(folder_ProcessedData,'Metadata_',Sites{i});
+    Data{i} = load(ProcessedData_Path); %load processed data
+    Metadata{i} = load(Metadata_Path); %load metadata
+end
 
 %% parameter values
 %set physical parameters
@@ -492,3 +492,8 @@ xlabel('u_{*,Re,localavg} (m/s)','FontSize',16);
 ylabel('(\kappa z)/(u_{*,Re,localavg})(du/dz)','FontSize',16);
 set(gca,'FontSize',16);
 print([folder_Plots,'UstExpRe.png'],'-dpng');
+
+%clear excess files and save remaining for future analysis
+clear('Data','Metadata','WindData','Flux');
+SaveData_Path = strcat(folder_ProcessedData,'vonKarmanData');
+save(SaveData_Path);
