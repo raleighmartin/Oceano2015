@@ -70,4 +70,4 @@ for i = 1:N_InstrumentTypes
     end
 end
     
-InterpolatedData = RawData; %now that everything is done, rename "RawData" as "ProcessedData"
+InterpolatedData = RawData; %now that everything is done, rename "RawData" as "InterpolatedData"

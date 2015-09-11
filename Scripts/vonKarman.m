@@ -10,7 +10,7 @@ folder_Plots = '../PlotOutput/vonKarman/'; %folder for plots
 
 %information about sites for analysis
 Sites = {'Jericoacoara','RanchoGuadalupe','Oceano'};
-Markers = {'x','o','v'};
+Markers = {'bx','ro','gv'};
 N_Sites = length(Sites);
 
 for i = 1:N_Sites
@@ -28,10 +28,10 @@ kappa = 0.39; %von Karman parameter
 g = 9.8; %gravity m/s^2
 
 %set fitting parameters
-z_max_fit = 2; %maximum instrument height (m) for profile fit
+z_max_fit = 2.5; %maximum instrument height (m) for profile fit
 
 %set time interval for computing velocity profiles
-ProfileTimeInterval = duration(0,15,0); %30 minutes
+ProfileTimeInterval = duration(0,15,0); %15 minutes
 
 %% INITIALIZE CELL ARRAYS
 %initialize cell arrays for all sites
@@ -46,8 +46,8 @@ ustRe_profiles_raw = cell(N_Sites,1); %initialize list of Reynolds shear velocit
 ustRe_dudz_profiles_raw = cell(N_Sites,1); %initialize list of Reynolds shear velocities
 heatflux_profiles_raw = cell(N_Sites,1); %initialize list of heat fluxes
 dudz_profiles_raw = cell(N_Sites, 1); %inialize list of du/dz profiles
-ustExp_profiles_raw = cell(N_Sites,1); %initialize list of expected shear velocities from du/dz - raw
-ustExpStab_profiles_raw = cell(N_Sites,1); %initialize list of expected shear velocities from du/dz - raw, stability corrected
+ustdudz_profiles_raw = cell(N_Sites,1); %initialize list of expected shear velocities from du/dz - raw
+ustdudzStab_profiles_raw = cell(N_Sites,1); %initialize list of expected shear velocities from du/dz - raw, stability corrected
 
 %initialize cell arrays of calibrated profiles
 u_profiles_cal = cell(N_Sites,1); %initialize list of calibrated velocity profiles
@@ -55,20 +55,20 @@ ustRe_profiles_cal = cell(N_Sites,1); %initialize list of calibrated Reynolds sh
 ustRe_dudz_profiles_cal = cell(N_Sites,1); %initialize list of calibrated Reynolds shear velocities
 heatflux_profiles_cal = cell(N_Sites,1); %initialize list of calibrated heat fluxes
 dudz_profiles_cal = cell(N_Sites, 1); %inialize list of du/dz profiles
-ustExp_profiles_cal = cell(N_Sites,1); %initialize list of expected shear velocities from du/dz - calibrated
-ustExpStab_profiles_cal = cell(N_Sites,1); %initialize list of expected shear velocities from du/dz - calibrated, stability corrected
+ustdudz_profiles_cal = cell(N_Sites,1); %initialize list of expected shear velocities from du/dz - calibrated
+ustdudzStab_profiles_cal = cell(N_Sites,1); %initialize list of expected shear velocities from du/dz - calibrated, stability corrected
 
 %initialize lists of raw profile aggregate values
 ustLog_list_raw = cell(N_Sites,1); %raw u* for log law
 z0_list_raw = cell(N_Sites,1); %raw z0 for log law
-ustStab_list_raw = cell(N_Sites,1); %stability-corrected u* for log law
+ustLogStab_list_raw = cell(N_Sites,1); %stability-corrected u* for log law
 z0Stab_list_raw = cell(N_Sites,1); %stability-corrected z0 for log law
 ustRe_lowest_raw = cell(N_Sites,1); %raw u* for Reynolds stress of lowest anemometer
 
 %initialize lists of calibrated profile aggregate values
 ustLog_list_cal = cell(N_Sites,1); %calibrated u* for log law
 z0_list_cal = cell(N_Sites,1); %calibrated z0 for log law
-ustStab_list_cal = cell(N_Sites,1); %stability-corrected calibrated u* for log law
+ustLogStab_list_cal = cell(N_Sites,1); %stability-corrected calibrated u* for log law
 z0Stab_list_cal = cell(N_Sites,1); %stability-corrected calibrated z0 for log law
 ustRe_lowest_cal = cell(N_Sites,1); %calibrated u* for Reynolds stress of lowest anemometer
 
@@ -78,7 +78,6 @@ zbar_list = cell(N_Sites,1); %flux height
 
 %% PERFORM ANALYSIS FOR EACH SITE
 for i = 1:N_Sites
-%for i = 1;
 
     %choose anemometer type based on site of interest
     if strcmp(Sites{i},'Oceano')
@@ -118,8 +117,8 @@ for i = 1:N_Sites
     ustRe_dudz_profiles_raw{i} = cell(N_Blocks,1); %initialize list of Reynolds shear velocities
     heatflux_profiles_raw{i} = cell(N_Blocks,1); %initialize list of heat fluxes
     dudz_profiles_raw{i} = cell(N_Blocks, 1); %inialize list of du/dz profiles
-    ustExp_profiles_raw{i} = cell(N_Blocks,1); %initialize list of expected shear velocities from du/dz - raw
-    ustExpStab_profiles_raw{i} = cell(N_Blocks,1); %initialize list of expected shear velocities from du/dz - raw, stability corrected
+    ustdudz_profiles_raw{i} = cell(N_Blocks,1); %initialize list of expected shear velocities from du/dz - raw
+    ustdudzStab_profiles_raw{i} = cell(N_Blocks,1); %initialize list of expected shear velocities from du/dz - raw, stability corrected
     
     %initialize cell arrays of calibrated profiles
     u_profiles_cal{i} = cell(N_Blocks,1); %initialize list of calibrated velocity profiles
@@ -127,20 +126,20 @@ for i = 1:N_Sites
     ustRe_dudz_profiles_cal{i} = cell(N_Blocks,1); %initialize list of calibrated Reynolds shear velocities
     heatflux_profiles_cal{i} = cell(N_Blocks,1); %initialize list of calibrated heat fluxes
     dudz_profiles_cal{i} = cell(N_Blocks, 1); %inialize list of du/dz profiles
-    ustExp_profiles_cal{i} = cell(N_Blocks,1); %initialize list of expected shear velocities from du/dz - calibrated
-    ustExpStab_profiles_cal{i} = cell(N_Blocks,1); %initialize list of expected shear velocities from du/dz - calibrated, stability corrected
+    ustdudz_profiles_cal{i} = cell(N_Blocks,1); %initialize list of expected shear velocities from du/dz - calibrated
+    ustdudzStab_profiles_cal{i} = cell(N_Blocks,1); %initialize list of expected shear velocities from du/dz - calibrated, stability corrected
     
     %initialize lists of raw profile aggregate values
     ustLog_list_raw{i} = zeros(N_Blocks,1); %raw u* for log law
     z0_list_raw{i} = zeros(N_Blocks,1); %raw z0 for log law
-    ustStab_list_raw{i} = zeros(N_Blocks,1); %stability-corrected u* for log law
+    ustLogStab_list_raw{i} = zeros(N_Blocks,1); %stability-corrected u* for log law
     z0Stab_list_raw{i} = zeros(N_Blocks,1); %stability-corrected z0 for log law
     ustRe_lowest_raw{i} = zeros(N_Blocks,1); %u* for Reynolds stress of lowest anemometer
     
     %initialize lists of calibrated profile aggregate values
     ustLog_list_cal{i} = zeros(N_Blocks,1); %calibrated u* for log law
     z0_list_cal{i} = zeros(N_Blocks,1); %calibrated z0 for log law
-    ustStab_list_cal{i} = zeros(N_Blocks,1); %stability-corrected calibrated u* for log law
+    ustLogStab_list_cal{i} = zeros(N_Blocks,1); %stability-corrected calibrated u* for log law
     z0Stab_list_cal{i} = zeros(N_Blocks,1); %stability-corrected calibrated z0 for log law
     ustRe_lowest_cal{i} = zeros(N_Blocks,1); %calibrated u* for Reynolds stress
 
@@ -282,8 +281,8 @@ for i = 1:N_Sites
         zL_fit_cal = zL_profile_cal(ind_fit);
         
         %fit log-law using raw and calibrated values
-        [ustLog_raw, z0_raw, ustStab_raw, z0Stab_raw] = FitLogLaw(z_fit,u_fit_raw,zL_fit_raw,kappa);
-        [ustLog_cal, z0_cal, ustStab_cal, z0Stab_cal] = FitLogLaw(z_fit,u_fit_cal,zL_fit_cal,kappa);
+        [ustLog_raw, z0_raw, ustLogStab_raw, z0Stab_raw] = FitLogLaw(z_fit,u_fit_raw,zL_fit_raw,kappa);
+        [ustLog_cal, z0_cal, ustLogStab_cal, z0Stab_cal] = FitLogLaw(z_fit,u_fit_cal,zL_fit_cal,kappa);
     
         %compute du/dz within profiles
         dz_profile = diff(z_profile);
@@ -301,10 +300,10 @@ for i = 1:N_Sites
         phi_dudz_profile_cal = (1-15*zL_dudz_profile_cal).^(-1/4);
         
         %compute expected ust based on du/dz and similarity parameter
-        ustExp_profile_raw = (kappa*z_dudz_profile.*dudz_profile_raw); %no stability correction
-        ustExp_profile_cal = (kappa*z_dudz_profile.*dudz_profile_cal); %no stability correction
-        ustExpStab_profile_raw = (kappa*z_dudz_profile.*dudz_profile_raw./phi_dudz_profile_raw);
-        ustExpStab_profile_cal = (kappa*z_dudz_profile.*dudz_profile_cal./phi_dudz_profile_cal);
+        ustdudz_profile_raw = (kappa*z_dudz_profile.*dudz_profile_raw); %no stability correction
+        ustdudz_profile_cal = (kappa*z_dudz_profile.*dudz_profile_cal); %no stability correction
+        ustdudzStab_profile_raw = (kappa*z_dudz_profile.*dudz_profile_raw./phi_dudz_profile_raw);
+        ustdudzStab_profile_cal = (kappa*z_dudz_profile.*dudz_profile_cal./phi_dudz_profile_cal);
         
         %compute ustRe at individual heights of du/dz by averaging
         ustRe_dudz_profile_raw = mean([ustRe_profile_raw(1:end-1),ustRe_profile_raw(2:end)]')';
@@ -322,10 +321,10 @@ for i = 1:N_Sites
         ustRe_dudz_profiles_raw{i}{j} = ustRe_dudz_profile_raw;
         heatflux_profiles_raw{i}{j} = heatflux_profile_raw;
         dudz_profiles_raw{i}{j} = dudz_profile_raw;
-        ustExp_profiles_raw{i}{j} = ustExp_profile_raw;
-        ustExpStab_profiles_raw{i}{j} = ustExpStab_profile_raw;
-        ustExp_profiles_cal{i}{j} = ustExp_profile_cal;
-        ustExpStab_profiles_cal{i}{j} = ustExpStab_profile_cal;
+        ustdudz_profiles_raw{i}{j} = ustdudz_profile_raw;
+        ustdudzStab_profiles_raw{i}{j} = ustdudzStab_profile_raw;
+        ustdudz_profiles_cal{i}{j} = ustdudz_profile_cal;
+        ustdudzStab_profiles_cal{i}{j} = ustdudzStab_profile_cal;
         
         %add individual profiles to cell arrays of profiles - calibrated profiles
         u_profiles_cal{i}{j} = u_profile_cal;
@@ -337,14 +336,14 @@ for i = 1:N_Sites
         %add values to lists - raw values
         ustLog_list_raw{i}(j) = ustLog_raw; %raw u* for log law
         z0_list_raw{i}(j) = z0_raw; %raw z0 for log law
-        ustStab_list_raw{i}(j) = ustStab_raw; %raw stability corrected u* for log law
+        ustLogStab_list_raw{i}(j) = ustLogStab_raw; %raw stability corrected u* for log law
         z0Stab_list_raw{i}(j) = z0Stab_raw; %raw stability corrected z0 for log law
         ustRe_lowest_raw{i}(j) = ustRe_profile_raw(1); %u* for Reynolds stress
         
         %add values to lists - calibrated values
         ustLog_list_cal{i}(j) = ustLog_cal; %calibrated u* for log law
         z0_list_cal{i}(j) = z0_cal; %calibrated z0 for log law
-        ustStab_list_cal{i}(j) = ustStab_cal; %calibrated stability corrected u* for log law
+        ustLogStab_list_cal{i}(j) = ustLogStab_cal; %calibrated stability corrected u* for log law
         z0Stab_list_cal{i}(j) = z0Stab_cal; %calibrated stability corrected z0 for log law
         ustRe_lowest_cal{i}(j) = ustRe_profile_cal(1); %calibrated u* for Reynolds stress
         
@@ -361,6 +360,14 @@ for i = 1:N_Sites
             qz_profile = mean(Flux(IntervalN).qz.calc([IntervalInd{:}],:));
             zq_profile = Flux(IntervalN).z.calc;
             [zbar,~,Q] = qz_profilefit(zq_profile,qz_profile);
+            
+            %convert to 0 if NaN
+            if isnan(Q)
+                Q=0;
+            end
+            if isnan(zbar)
+                zbar=0;
+            end
             
             %add to list
             Q_list{i}(j) = Q; %g/m/s
@@ -423,7 +430,7 @@ print([folder_Plots,'ReynoldsLog_Uncorrected_2m.png'],'-dpng');
 %plot u*log versus u*Reynolds (lowest anemometer) using calibrated values with stability correction
 figure(4); clf; hold on;
 for i=1:N_Sites
-    plot(ustRe_lowest_cal{i},ustStab_list_cal{i},Markers{i});
+    plot(ustRe_lowest_cal{i},ustLogStab_list_cal{i},Markers{i});
 end
 plot([0 0.6],[0 0.6],'k');
 h_legend = legend(Sites,'Location','NorthWest');
@@ -436,7 +443,7 @@ print([folder_Plots,'ReynoldsLog_Corrected.png'],'-dpng');
 %plot ratio of u*log (stability corrected) over u*Reynolds (lowest anemometer) versus sediment flux
 figure(5); clf; hold on;
 for i=1:N_Sites
-    plot(Q_list{i},ustStab_list_cal{i}./ustRe_lowest_cal{i},Markers{i});
+    plot(Q_list{i},ustLogStab_list_cal{i}./ustRe_lowest_cal{i},Markers{i});
 end
 plot([0 60],[1 1]);
 xlim([0 60]);
@@ -451,7 +458,7 @@ print([folder_Plots,'StressRatioFlux.png'],'-dpng');
 %plot ratio of u*log (stability corrected) over u*Reynolds (lowest anemometer) versus saltation height
 figure(6); clf; hold on;
 for i=1:N_Sites
-    plot(zbar_list{i},ustStab_list_cal{i}./ustRe_lowest_cal{i},Markers{i});
+    plot(zbar_list{i},ustLogStab_list_cal{i}./ustRe_lowest_cal{i},Markers{i});
 end
 plot([0 0.2],[1 1]);
 xlim([0 0.2]);
@@ -463,10 +470,10 @@ ylabel('u_{*,log}/u_{*,Re,lowest}','FontSize',16);
 set(gca,'FontSize',16);
 print([folder_Plots,'StressRatioZsalt.png'],'-dpng');
 
-%plot ratio of u*log (stability corrected) over u*Reynolds (lowest anemometer) versus product of sediment flux and saltation height
+%plot ratio of u*log (not stability corrected) over u*Reynolds (lowest anemometer) versus product of sediment flux and saltation height
 figure(7); clf; hold on;
 for i=1:N_Sites
-    plot(Q_list{i}.*zbar_list{i},ustStab_list_cal{i}./ustRe_lowest_cal{i},Markers{i});
+    plot(Q_list{i}.*zbar_list{i},ustLog_list_cal{i}./ustRe_lowest_cal{i},Markers{i});
 end
 plot([0 10],[1 1]);
 ylim([0.75 1.5]);
@@ -475,14 +482,39 @@ set(h_legend,'FontSize',16);
 xlabel('Q * z_{salt} (g/s)','FontSize',16);
 ylabel('u_{*,log}/u_{*,Re,lowest}','FontSize',16);
 set(gca,'FontSize',16);
-print([folder_Plots,'StressRatioQZ.png'],'-dpng');
+print([folder_Plots,'StressRatioQZ_notstabilitycorrected.png'],'-dpng');
+
+%plot ratio of u*log (stability corrected) over u*Reynolds (lowest anemometer) versus product of sediment flux and saltation height
+figure(8); clf; hold on;
+for i=1:N_Sites
+    plot(Q_list{i}.*zbar_list{i},ustLogStab_list_cal{i}./ustRe_lowest_cal{i},Markers{i});
+end
+plot([0 10],[1 1]);
+ylim([0.75 1.5]);
+h_legend = legend(Sites,'Location','SouthEast');
+set(h_legend,'FontSize',16);
+xlabel('Q * z_{salt} (g/s)','FontSize',16);
+ylabel('u_{*,log}/u_{*,Re,lowest}','FontSize',16);
+set(gca,'FontSize',16);
+print([folder_Plots,'StressRatioQZ_stabilitycorrected.png'],'-dpng');
 
 %plot ratio of expected u* from local velocity profile (stability corrected) versus u*Reynolds (average of closest anemometers)
-figure(8); clf; hold on;
+figure(9); clf; hold on;
+ustRe_binedges = 0:0.05:0.6;
+ustRe_bincenters = 0.025:0.05:0.575;
+N_bins = length(ustRe_bincenters);
 for i = 1:N_Sites
-    ustExpStab_list = vertcat(ustExpStab_profiles_cal{i}{:});
+    ustRatio_binavgs = zeros(1,N_bins);
+    ustdudzStab_list = vertcat(ustdudzStab_profiles_cal{i}{:});
     ustRe_list = vertcat(ustRe_dudz_profiles_cal{i}{:});
-    plot(ustRe_list,ustExpStab_list./ustRe_list,'x');
+    zU_list = vertcat(z_dudz_profiles{i}{:});
+    ustRatio_sublist = ustdudzStab_list(zU_list<=z_max_fit)./ustRe_list(zU_list<=z_max_fit); %sublist of u*expected/u*Re ratio filtered by z<z_max
+    ustRe_sublist = ustRe_list(zU_list<=z_max_fit); %sublist of u*Re filtered by z<z_max
+    for j = 1:N_bins
+        ustRatio_bin = ustRatio_sublist(ustRe_sublist>=ustRe_binedges(j)&ustRe_sublist<=ustRe_binedges(j+1));
+        ustRatio_binavgs(j) = median(ustRatio_bin(~isnan(ustRatio_bin)));
+    end
+    plot(ustRe_bincenters, ustRatio_binavgs,['-',Markers{i}]);
 end
 plot([0 0.6],[1 1]);
 ylim([0 2]);
@@ -491,7 +523,58 @@ set(h_legend,'FontSize',16);
 xlabel('u_{*,Re,localavg} (m/s)','FontSize',16);
 ylabel('(\kappa z)/(u_{*,Re,localavg})(du/dz)','FontSize',16);
 set(gca,'FontSize',16);
-print([folder_Plots,'UstExpRe.png'],'-dpng');
+print([folder_Plots,'ustdudzReRatio_ustRe.png'],'-dpng');
+
+%plot ratio of expected u* from local velocity profile (stability corrected) versus Q (average of closest anemometers), conditioned on z_U/z_salt
+figure(10); clf; hold on;
+zuNorm_binedges = 0:15:60;
+zuNorm_bincenters = 7.5:15:52.5;
+LineStyles = {'-','--',':','-.'};
+N_zubins = length(zuNorm_bincenters);
+flux_binedges = 0:10:60;
+flux_bincenters = 5:10:55;
+N_fluxbins = length(flux_bincenters);
+legend_entries = cell(N_Sites*N_zubins,1);
+for i = 1:N_Sites
+    ustdudzStab_list = vertcat(ustdudzStab_profiles_cal{i}{:}); %get combined list of u*dudz
+    ustRe_list = vertcat(ustRe_dudz_profiles_cal{i}{:}); %get combined list of u*Re
+    ustRatio_list = ustdudzStab_list./ustRe_list; %list of u*dudz/u*Re ratio
+    N_profiles = length(zbar_list{i});
+    zuNorm_list = []; %initialize list of normalized heights
+    flux_list = []; %initialize list of fluxes
+    for j = 1:N_profiles
+        zuNorm_list = [zuNorm_list; z_dudz_profiles{i}{j}./zbar_list{i}(j)]; %add to list of normalized anemometer heights
+        flux_list = [flux_list; Q_list{i}(j)*ones(size(z_dudz_profiles{i}{j}))]; %add to list of fluxes
+    end
+    
+    %go through each normalized anemometer height bin
+    ustRatio_binavgs = zeros(N_zubins,N_fluxbins); %initialize bin averages of ustdudz/ustRe
+    for j = 1:N_zubins
+        flux_sublist = flux_list(zuNorm_list>=zuNorm_binedges(j)&zuNorm_list<=zuNorm_binedges(j+1));
+        ustRatio_sublist = ustRatio_list(zuNorm_list>=zuNorm_binedges(j)&zuNorm_list<=zuNorm_binedges(j+1));
+        
+        %go through each flux bin
+        for k = 1:N_fluxbins
+            ustRatio_bin = ustRatio_sublist(flux_sublist>=flux_binedges(k)&flux_sublist<=flux_binedges(k+1));
+            ustRatio_binavgs(j,k) = median(ustRatio_bin);
+        end
+        plot(flux_bincenters, ustRatio_binavgs(j,:),[LineStyles{j},Markers{i}]);
+        legend_entries{(N_zubins+1)*(i-1)+j}=[Sites{i},', z_{U}/z_{salt} = ',int2str(zuNorm_binedges(j)),' - ',int2str(zuNorm_binedges(j+1))];
+    end
+    
+    %also, plot the case where Q = 0 and zuNorm is undefined
+    ustRatio_0 = ustRatio_list(flux_list==0);
+    plot(0,median(ustRatio_0(~isnan(ustRatio_0))),Markers{i},'MarkerSize',12)
+    median(ustRatio_0(~isnan(ustRatio_0)))
+    legend_entries{(N_zubins+1)*i}=[Sites{i},', Q = 0 g/m/s'];
+end
+plot([0 0.6],[1 1]);
+h_legend = legend(legend_entries,'Location','EastOutside');
+set(h_legend,'FontSize',10);
+xlabel('Q (g/m/s)','FontSize',16);
+ylabel('(\kappa z)/(u_{*,Re,localavg})(du/dz)','FontSize',16);
+set(gca,'FontSize',16);
+print([folder_Plots,'ustdudzReRatio_Q.png'],'-dpng');
 
 %clear excess files and save remaining for future analysis
 clear('Data','Metadata','WindData','Flux');
