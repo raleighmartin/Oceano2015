@@ -3,13 +3,13 @@
 % 'MaxOverlappingInterval', 'reorient_anemometers_vanboxel2004'
 
 %%clear existing data and load processed data and metadata
-% clear all;
+%clear all;
 folder_ProcessedData = '../../../Google Drive/Data/AeolianFieldwork/Processed/'; %folder for storing data output
 folder_Plots = '../PlotOutput/BSNE/'; %folder for plots
 saveMetadata_Path = strcat(folder_ProcessedData,'Metadata_Oceano'); %get path to saving meta data
 saveProcessedData_Path = strcat(folder_ProcessedData,'ProcessedData_Oceano'); %get path to saving processed data
 load(saveMetadata_Path); %load metadata
-% load(saveProcessedData_Path); %load processed data
+%load(saveProcessedData_Path); %load processed data
 
 %set physical parameters
 rho_a = 1.23; %kg/m^3
@@ -187,23 +187,26 @@ for i = 1:N_Blocks
     figure(1); clf;
     
     %plot actual values
-    semilogx(qz,z,'kx','MarkerSize',5); hold on;
-    text(qz,z,name);
+    semilogx(qz,z,'kx','MarkerSize',10); hold on;
+    text(qz*1.2,z,name,'FontSize',16);
    
     %plot fit profiles
-    plot(qz_fit,z_fit,'k')
-    plot(qz_fit_min,z_fit,'r');
-    plot(qz_fit_max,z_fit,'b');
-    
-    %plot mean heights
-    plot(q0*exp(-1),zbar,'k+','MarkerSize',10)
-    plot(q0_min*exp(-1),zbar_min,'r+','MarkerSize',10);
-    plot(q0_max*exp(-1),zbar_max,'b+','MarkerSize',10);    
+    plot(qz_fit,z_fit,'b','LineWidth',3) %mean profile
+%     plot(qz_fit_min,z_fit,'r'); %minium profile
+%     plot(qz_fit_max,z_fit,'b'); %maximum profile
+%     
+%     %plot mean heights
+%     plot(q0*exp(-1),zbar,'k+','MarkerSize',10)
+%     plot(q0_min*exp(-1),zbar_min,'r+','MarkerSize',10);
+%     plot(q0_max*exp(-1),zbar_max,'b+','MarkerSize',10);    
     
     %label plot
-    title(datestr(Q_time_list(i)),'FontSize',16);
-    xlabel('flux (g/m/s^2)','FontSize',16);
+    title([datestr(BSNE_i.StartTime, 'yyyy-mm-dd HH:MM'),' - ',datestr(BSNE_i.EndTime, 'HH:MM')],'FontSize',16);
+    xlabel('BSNE flux (g/m/s^2)','FontSize',16);
     ylabel('height (m)','FontSize',16);
+    xlim([10^floor(log10(min(qz))) 10^ceil(log10(max(qz)))])
+    set(gca,'FontSize',16);
+    set(gcf,'PaperUnits','inches','PaperPosition',[0 0 5 2.5])
     print([folder_Plots,'/Profiles/FluxProfile_',datestr(Q_time,'yyyy-mm-dd_HHMM'),'.png'],'-dpng');
     
     %add values to lists
@@ -297,7 +300,6 @@ corr_matrix = corrcoef(ust_log_cal_list(onshorewind_ind).^2,Q_list(onshorewind_i
 title(['r = ',num2str(corr_matrix(2))],'FontSize',16)
 set(gca,'FontSize',16);
 print([folder_Plots,'LogStressBSNE_Calibrated.png'],'-dpng');
-
 
 %plot flux heights versus shear velocity - calibrated Reynolds
 figure(5); clf;

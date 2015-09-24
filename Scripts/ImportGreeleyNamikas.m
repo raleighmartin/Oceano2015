@@ -211,20 +211,33 @@ for i=1:N_Namikas03
     print([folder_Plots,'Namikas03_qzprofile_',RunName_Namikas03{i},'.png'],'-dpng');
 end
 
-%plot zbar versus u*
+%plot zbar(e) versus u*
 figure(20); clf;
 plot(ust_mpers_Greeley96,zbar_m_Greeley96,'r^',...
     ust_mpers_Namikas03,zbar_m_Namikas03,'gd',...
     'MarkerSize',10);
 xlabel('u_{*} (m/s)','FontSize',16);
-ylabel('z_{q} (m)','FontSize',16);
+ylabel('z_{q,e} (m)','FontSize',16);
 set(gca,'FontSize',16);
 h_legend = legend({'Greeley (1996)','Namikas (2003)'},'Location','NorthEast');
 set(h_legend,'FontSize',16);
-print([folder_Plots,'GreeleyNamikas_ust_zsalt.png'],'-dpng');
+print([folder_Plots,'GreeleyNamikas_ust_zsalt_e.png'],'-dpng');
+
+%plot z50 versus u*
+figure(21); clf;
+plot(ust_mpers_Greeley96,zbar_m_Greeley96*log(2),'r^',...
+    ust_mpers_Namikas03,zbar_m_Namikas03*log(2),'gd',...
+    'MarkerSize',10);
+xlabel('u_{*} (m/s)','FontSize',16);
+ylabel('z_{q,50} (m)','FontSize',16);
+ylim([0.03 0.04]);
+set(gca,'FontSize',16);
+h_legend = legend({'Greeley (1996)','Namikas (2003)'},'Location','NorthEast');
+set(h_legend,'FontSize',16);
+print([folder_Plots,'GreeleyNamikas_ust_zsalt_50.png'],'-dpng');
 
 %plot Q versus u*
-figure(21); clf;
+figure(22); clf;
 plot(ust_mpers_Greeley96,Q_gperm2s_Greeley96,'r^',...
     ust_mpers_Namikas03,Q_gperm2s_Namikas03,'gd',...
     'MarkerSize',10);
