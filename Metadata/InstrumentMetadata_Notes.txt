@@ -67,6 +67,8 @@ Allocation of instruments:
 5/27/2015: W1=R2, W2=R10, W3=R6, W4=14, W5=R4, W6=R9, W7=R5, W8=21, W9=R1
 6/1/2015: W1=R2, W2=R10, W3=R6, W4=14, W5=R4, W6=R8, W7=R5, W8=21, W9=R1
 6/2/2015: W1=23, W2=9, W3=R6, W4=14, W5=R4, W6=R8, W7=R5, W8=21, W9=R1
+6/3/2015: W1=R8, W2=R9, W3=21, W4=19, W5=R4, W6=R5, W7=R6, W8=14, W9=R10
+6/4/2015: W1=R8, W2=R2, W3=21, W4=R1, W5=R4, W6=R5, W7=R6, W8=14, W9=R10
 
 —- Weather station —-
 Mounted on downwind side of tower.
@@ -272,34 +274,60 @@ Raleigh and Livia in field all day.  Very humid on arrival.  Soil wet just below
 U3 not working, tried diagnostics.  Came back to life on its own around 2 PM
 Due to interference, consider U4 starting at 12:32 PM
 1:11 PM - 1:16 PM -- Interference to recalibrate Wenglors, now have all working.
-2:24 PM - 2:28 PM -- Interference ot recalibrate Wenglors given possible drift due to further drying of water on lenses.
+2:24 PM - 2:28 PM -- Interference to recalibrate Wenglors given possible drift due to further drying of water on lenses.
 
 Dust sensor 4 off at 5:30 PM
 Dust sensor 3 off from 5:30 - 5:31 PM during removal of dust sensor 4
 All dust sensors off at 6:14 PM
 Other loggers off at 6:16 PM
 
+-- Oceano 6/3/15 --
+SALTATION (Strong)
+Raleigh and Arkayan in field.
+Wenglor assignments: W1=R8, W2=R9, W3=21, W4=19, W5=R4, W6=R5, W7=R6, W8=14, W9=R10
+9:58 AM -- All loggers synced
+10:34 AM -- End of Wenglor / Sonic interference (beginning of usable data)
+10:40 AM -- BSNE / ultrasonic start
+11:57 AM -- dust sensors on
+~12 PM -- clearing of clouds, wind picks up
+6:34 PM -- Wenglor / Sonic interference
+6:36 PM -- Dust data collection
+
+-- Oceano 6/4/15 --
+SALTATION (Very Weak)
+Raleigh and Livia in field.
+Wenglors: now W2=R2(was R9), W4=R1(was 19), all others the same
+10:45 AM -- All loggers synced
+10:50 AM -- Surface samples 
+11:10 AM -- Measured instrument heights
+11:07 AM -- End of Wenglor / Sonic interference
+11:21 AM -- Started BSNEs, end of ultrasonic interference
+11:24 AM -- Started dust sensors
+3:21 PM -- Ended BSNEs, ultrasonic interference
+3:22 PM -- Dust sensors off
+Re-measure height from S1 to L1/L2: z=+41 cm, y=-5 cm 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INSTRUMENT SERIAL NUMBERS %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Wenglors
-9: ?
-14: ?
-19: ?
-21: ?
-23: ?
-R1: ?
-R2: ?
-R4: ?
-R5: ?
-R6: ?
-R7: ?
-R9: ?
-R10: ?
+Wenglors (NOTE: non-unique identifiers)
+9: 2707R/4500017061/C
+14: 2707R/4500017061/C
+19: 0510R/D/4500037163
+21: 2707R/4500017061/C
+23: 0510R/D/4500037163
+R1: 4913R/E/1098987
+R2: 4913R/E/1098987
+R4: 2614R/E/1108807
+R5: 2614R/E/1108807
+R6: 3114R/E/1110571
+R7: 3114R/E/1110571
+R9: 2614R/E/1108807
+R10: 3114R/E/1110571
 
 Distance Sensors (Sick)
-L1: ?
-L2: ?
+L1: 14020114
+L2: 13390344
 
 Cups (Met One)
 C2: J3311
@@ -309,8 +337,8 @@ C6: J8607
 
 Ultrasonics (RM Young)
 U1: 02379
-U2: ?
-U3: ?
+U2: 02309
+U3: 02380
 U4: 02354
 
 Sonics (Campbell CSAT)
