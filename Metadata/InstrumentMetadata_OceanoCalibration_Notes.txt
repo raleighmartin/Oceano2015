@@ -55,8 +55,8 @@ C6: J8607
 
 Ultrasonics (RM Young)
 U1: 02379
-U2: ?
-U3: ?
+U2: 02309
+U3: 02380
 U4: 02354
 
 Sonics (Campbell CSAT)
@@ -83,3 +83,6 @@ D2: 9290
 D3: 9281
 D4: 9278
 D5: 9287
+
+Weather Station
+WS: 43282163

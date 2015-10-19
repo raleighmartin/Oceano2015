@@ -163,8 +163,9 @@ Raleigh, Livia, and Arkayan in field
 Started using RM Young ultrasonic anemometers today (z~63 cm)
 ? AM - Surface sampling for Wenglors / BSNEs
 11:28 - Start time for Wenglors, distance sensors, and lower sonics
-Many missing times in logger A records for Wenglors prior to 13:21 (especially before 12:37)
+Many missing times in logger A records for Wenglors prior to 13:21 (especially before 12:37) - use only data after 12:37 for Wenglors
 13:50 - 15:18 - Interval for all dust sensors.  At 15:18 PM, switched D2 and D3 for a test (later switched back?).  One of dust sensors (which one?) failed due to blown fuse.  Replaced fuse and redeployed.
+15:38 - 15:40 - Some timing issues with Wenglors / Distance sensors, but keeping them in analysis for continuity
 17:53 - End time for Wenglors, distance sensors, and lower sonics
 BSNE intervals (for analysis of ultrasonic anemometers): 14:13-15:13, 15:25-16:25.  One earlier BSNE interval, but ultrasonics were not running at this time.
 
@@ -172,21 +173,27 @@ BSNE intervals (for analysis of ultrasonic anemometers): 14:13-15:13, 15:25-16:2
 NO SALTATION
 Nobody in field, but instruments running. (Did someone start instruments at 10:23 AM?)
 Note missing data from cups today after 10:16 AM
-
+10:20 - 11:06: Missing data from weather station
+21:09: S4 anemometer appears to fail after this time
 
 -- Oceano 5/21/15 —-
 NO SALTATION
 Nobody in field, but instruments running.
+11:13: Sonics appear to be malfunctioning before this time
+11:17-11:28: U3/U4 appear to be malfunctioning during this time
 
 —- Oceano 5/22/15 —-
 NO SALTATION
 Raleigh and Arkayan went to field, discovered timing problems with GPS command.  Also, went to field anticipating saltation but none occurred.  Stopped instruments running.
+10:02: Sonics S1/S3/S5 appear to be malfunctioning after this time
+10:07: Sonics S2/S4/S6 appear to be malfunctioning after this time
 
 —- Oceano 5/23/15 —-
 SALTATION (STRONG)
 Raleigh and Livia in field.  Attempt to fix timing problems with GPS command.
 12:04: Reset times on all loggers using Raleigh’s computer.
 BSNE intervals (use for ultrasonics): 12-13:30, 13:40-14:40, 14:49-15:49, 15:58-16:58, 17:06-18:06.
+16:02 - 16:03: Some timing issues with Wenglors and Sonics, but keeping them in analysis
 18:25: Analysis end time.  Checked sync on loggers.  All loggers are offset by -1.2s relative to computer (i.e., later than computer) except for master which was offset by -0.3s relative to computer.
 
 !!! Significant gaps in timeseries due to failed “GPS” sync method.  Gaps identified at following times:
@@ -228,6 +235,8 @@ Raleigh and Livia in field.  Left in middle of day to visit Oso Flaco lake.
 11:30: Analysis start time (All loggers synced except C, end of instrument interference)
 BSNE interval (use for ultrasonics): 11:49 - 17:12
 12:19: Start time for dust sensors
+13:30: S6 anemometer appears to be failing after this time
+13:32-13:35: S4 anemometer failing here
 ?: Analysis end time
 17:24: Wenglor/BSNE surface sample
 
@@ -235,7 +244,9 @@ BSNE interval (use for ultrasonics): 11:49 - 17:12
 NO SALTATION
 Raleigh and Livia to field in morning to start instruments.  Arkayan and Livia to field in afternoon to stop instruments, collect data.  Moved three lowest dust sensors away from tower to see if reducing interference with other instruments will yield better profiles.
 Moved U1 ultrasonic to new (larger y, smaller z) position.  Also moved A1 BSNE to new (smaller y) position.
-11:22: Sync time among all loggers except loggerC and CR1000PSU (synced at 11:44 and 12:09, respectively).  
+11:22: Sync time among all loggers except loggerC and CR1000PSU (synced at 11:44 and 12:09, respectively). 
+13:28: S6 anemometer appears to be failing after this time
+14:07-14:30: S4 anemometer appears to be failing during this interval
 ?: End time for instruments
 
 —- Oceano 5/30/15 —-
@@ -243,6 +254,7 @@ NO SALTATION
 Raleigh and Livia to field in morning to start instruments.  Arkayan and Livia to field in afternoon to stop instruments, collect data.
 Sync time among loggers (except CR1000PSU, 10:21) at 10:10.
 Dust sensors on at 10:16.
+U3 has issues before 11:51 AM
 
 -- Oceano 5/31/15 --
 NO SALTATION
