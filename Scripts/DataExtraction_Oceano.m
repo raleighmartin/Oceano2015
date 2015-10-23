@@ -45,11 +45,11 @@ save(Metadata_Path,'LoggerTables','LoggerTimes','InstrumentVariables',...
    'GrainSizeMetadata_Surface','GrainSizeMetadata_BSNE','-v7.3');
 
 %% 5. Import and aggregate data from logger files
-%RawData = GetRawData(LoggerTables,LoggerTimes,InstrumentVariables,InstrumentMetadata,folder_LoggerRawData);
-%save(RawData_Path,'RawData','-v7.3'); %save raw data
+RawData = GetRawData(LoggerTables,LoggerTimes,InstrumentVariables,InstrumentMetadata,folder_LoggerRawData);
+save(RawData_Path,'RawData','-v7.3'); %save raw data
 
 %% 6. Perform interpolation on raw data
-load(RawData_Path); %load raw data if necessary
+%load(RawData_Path); %load raw data if necessary
 InterpolatedData = InterpolateData(RawData, InstrumentVariables); %interpolate raw data, flag errors
 
 %% 7. Apply calibration factor to data based on unique identifier
