@@ -12,12 +12,16 @@ RM Young sonics set such that u is negative downwind, v is negative to NNE
 -- General notes --
 Heights for BSNEs and ultrasonic anemometers are based entirely on measuring tape observations
 
-Heights of laser distance sensors, Wenglors, Campbell sonics, dust sensors, cup anemometers, and weather station (for the most part) are heights relative to L2 distance sensor, which is automatically set to 0 m.  Script will then adjust these heights based on observations from laser distance sensor. (We may want to subtract 2 cm from this z, because there was a decent amount of scour even below this front distance sensor, which looked to be about 2 cm.)
+Reported heights of laser distance sensors and Wenglors are heights relative to L1 (downwind) distance sensor.  Script will then adjust instrument heights based on observations from laser distance sensor.
+
+Originally, we also planned to compute heights of Campbell sonics, dust sensors, cup anemometers, and weather station relative to distance sensor reference height.  However, the distance sensors were subject to potential tilt effects, which would not have affected any other sensors except for the Wenglors.  Therefore, based on an initial measurement of z_L1 = 24 cm, we take z_ref = 24 cm to be the reference height for sonics S1-S3, the weather station WS, and dust sensors D1-D4 (when mounted on tower), and update these values accordingly in the InstrumentMetadata spreadsheet.  For all other instruments (C2-C6, S4-S6) measured relative to L1, due to lower precision, we use z_ref = 0.25 m.
 
 —- Distance Sensors —-
-L2 (upwind) distance sensor (x=-6cm, y=0cm) is reference for instrument heights.  z~24cm (varies dynamically in logger records).  Even though it is upwind of Wenglors, choose this is as height reference because there is a lot of scour beneath L1.
+L1 (downwind) distance sensor (x=0cm,y=0cm) is co-located with Wenglors. z~24cm (measured on 5/15/15 at beginning of deployment), but varies dynamically in logger records.  Despite potential scour effects, use this as reference height, because it more accurately captures changes in bed elevation which may have occurred due to tilting of instrument array.
 
-L1 (downwind) distance sensor (x=0cm,y=0cm) is co-located with Wenglors.  However, do not use this as reference distance sensor, because there is often significant scour beneath this sensor.
+L2 (upwind) distance sensor (x=-6cm, y=0cm).  z~24cm (measured on 5/15/15 at beginning of deployment), but varies dynamically in logger records.
+
+Somehow, it appears that the wires got crossed, and in all of the datalogger tables, what is named as “L1” is actually “L2” and vice versa.  This issue is accounted for by flipping the order of “L1” and “L2” in the file “LoggerTables_Oceano.”  However, when described in the notebook (and matched with serial numbers), the labels L1 and L2 refer to the correct instruments.
 
 —- Campbell Sonics —-
 Positions constant for whole period of deployment
