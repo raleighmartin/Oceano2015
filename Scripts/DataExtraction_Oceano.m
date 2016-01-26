@@ -9,9 +9,9 @@ folder_GeneralMetadata = '../../AeolianFieldworkAnalysis/Metadata/'; %folder wit
 folder_LoggerRawData = '../../../Google Drive/Data/AeolianFieldwork/Raw/Datalogger/'; %folder with logger raw data tables
 folder_DataOutput = '../../../Google Drive/Data/AeolianFieldwork/Processed/'; %folder for storing data output
 folder_GrainSize = '../../../Google Drive/Data/AeolianFieldwork/Raw/GrainSize/'; %folder with grain size data
-folder_Scripts = '../../AeolianFieldworkAnalysis/Scripts/'; %folder with general scripts for data analysis
 file_InstrumentCalibration = 'InstrumentCalibration.xlsx'; %file with instrument calibration values
-path(path,folder_Scripts); %add this path to locations for running functions
+folder_Functions = '../../AeolianFieldworkAnalysis/Scripts/Functions/'; %folder with functions
+addpath(folder_Functions); %point MATLAB to location of functions
 
 %site-specific information
 file_LoggerTables = 'LoggerTables_Oceano.xlsx'; %file with logger tables
