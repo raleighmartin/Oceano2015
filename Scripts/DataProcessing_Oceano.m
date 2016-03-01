@@ -14,6 +14,8 @@ Metadata_Path = strcat(folder_DataOutput,'Metadata_Oceano'); %get path to metada
 load(Metadata_Path);
 InterpolatedData_Path = strcat(folder_DataOutput,'InterpolatedData_Oceano'); %get path to interpolated data
 load(InterpolatedData_Path);
+
+BSNEData_Path = strcat(folder_DataOutput,'FluxBSNE_Oceano'); %path for saving output data
 ProcessedData_Path = strcat(folder_DataOutput,'ProcessedData_Oceano'); %create path to processed data
 
 %% 1. Process instrument heights
@@ -22,6 +24,7 @@ ProcessedData = ProcessInstrumentHeights(InterpolatedData);
 %% 2. Process BSNE profiles
 FluxBSNE = ProcessBSNEs(WeightBSNE,GrainSize_BSNE);
 ProcessedData.FluxBSNE = FluxBSNE;
+save(BSNEData_Path,'FluxBSNE'); %save BSNE data to avoid having to open full file in future
 
 %% 3. Process Wenglors
 [ProcessedWenglors, FluxWenglor] = ProcessWenglors(ProcessedData, FluxBSNE, InstrumentMetadata);
